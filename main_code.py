@@ -9,7 +9,6 @@ my_display.display_map([])
 
 running = True
 
-
 def get_input():
     while True:
         key = input("Input: ").lower()
