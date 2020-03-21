@@ -118,6 +118,3 @@ class Sanji(Nakama):
         super().__init__()
         self.icon = 'S '
         self.tiredness = {'ground': 1, 'mountain': 5, 'water': 10}
-
-
-print({nakama: nakama.icon for nakama in Nakama.get_possible_nakamas()})

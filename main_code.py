@@ -2,12 +2,13 @@ from world import World
 from displayer import Display
 from crew import Crew
 
-my_map = World(Crew())
+my_map = World(Crew(), 40, 40)
 my_display = Display(my_map)
 
 my_display.display_map([])
 
 running = True
+
 
 def get_input():
     while True:

@@ -111,6 +111,6 @@ class World:
             self.take_object((x, y), self.items[(x, y)])
             consequence.append('Object picked up !')
         elif self.is_nakama(x, y):
-            self.get_new_nakama((x,y), self.new_nakamas[x, y])
+            self.get_new_nakama((x, y), self.new_nakamas[x, y])
             consequence.append('Hurray ! We\'ve got a new Nakama !')
         return consequence
