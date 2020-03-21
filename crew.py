@@ -1,10 +1,12 @@
+from item import Food
+
 
 class Crew:
     def __init__(self):
         self.x = 0
         self.y = 0
         self.inventory = []
-        self.crew = [Luffy(), Nami(), Zorro()]
+        self.crew = [Luffy()]
         self.current_nakama = 0
         self.energy_level = 101
 
@@ -55,8 +57,8 @@ class Crew:
         self.y = 0
         self.energy_level = 100
 
-    def add_nakama(self):
-        pass
+    def add_nakama(self, nakama):
+        self.crew.append(nakama)
 
 
 class Nakama:
@@ -77,6 +79,10 @@ class Nakama:
     @classmethod
     def get_possible_nakamas(cls):
         return Nami(), Zorro(), Sanji(), Usopp()
+
+    @classmethod
+    def get_nakama_skin(cls):
+        return {type(nakama): nakama.icon for nakama in Nakama.get_possible_nakamas()}
 
 
 class Luffy(Nakama):
@@ -112,3 +118,6 @@ class Sanji(Nakama):
         super().__init__()
         self.icon = 'S '
         self.tiredness = {'ground': 1, 'mountain': 5, 'water': 10}
+
+
+print({nakama: nakama.icon for nakama in Nakama.get_possible_nakamas()})

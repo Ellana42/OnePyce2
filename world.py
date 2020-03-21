@@ -66,10 +66,13 @@ class World:
         return (x, y) in self.obstacles
 
     def is_object(self, x, y):
-        return (x, y) in self.items.keys()
+        return (x, y) in self.items
 
     def is_npc(self, x, y):
-        return (x, y) in self.npc.keys()
+        return (x, y) in self.npc
+
+    def is_nakama(self, x, y):
+        return (x, y) in self.new_nakamas
 
     # TODO modify with terrain generation
     def get_terrain(self, x, y):
@@ -78,6 +81,10 @@ class World:
     def take_object(self, object_coordinates, item):
         self.crew.take_item(item)
         del self.items[object_coordinates]
+
+    def get_new_nakama(self, nakama_coordinates, nakama):
+        self.crew.add_nakama(nakama)
+        del self.new_nakamas[nakama_coordinates]
 
     def update_world_and_events(self, key):
         events = []
@@ -103,4 +110,7 @@ class World:
         if self.is_object(x, y):
             self.take_object((x, y), self.items[(x, y)])
             consequence.append('Object picked up !')
+        elif self.is_nakama(x, y):
+            self.get_new_nakama((x,y), self.new_nakamas[x, y])
+            consequence.append('Hurray ! We\'ve got a new Nakama !')
         return consequence
