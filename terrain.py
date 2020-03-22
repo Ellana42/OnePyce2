@@ -6,6 +6,24 @@ from pygame import Rect, Color
 
 
 class Terrain:
+
+    @classmethod
+    def get_terrains(cls):
+        terrains = {
+            "S": ("Sea", "Water"),
+            "E": ("Pond","Water"),
+            "M": ("Mountain","Mountain"),
+            "F": ("Forest", "Forest"),
+            "B": ("Wood", "Forest"),
+            "P": ("Meadows", "Ground"),
+            "C": ("Field", "Ground"),
+            "X": ("Cliff", "Mountain"),
+            "G": ("Beach", "Ground"),
+            "R": ("Road", "Path"),
+            "V": ("City", "Path"),
+        }
+        return {k: {"name": name, "type": terrain_type} for k, (name, terrain_type) in terrains.items()}
+
     def __init__(self):
         island_size = randrange(40, 80)
         width, height = island_size, island_size
@@ -181,7 +199,6 @@ class Terrain:
         island_size = min(self.width, self.height)
         mountain_seeds = int(mountains_factor * island_size // 7)
         mountain_thickness = int(island_size * mountains_thickness) // 4
-        print(mountain_seeds, mountain_thickness)
 
         self.put_random_obstacles("M", randrange(int(mountain_seeds * 0.8) , mountain_seeds))
         self.multiple_pass("M", 0.10, randrange(int(mountain_thickness * 0.8), mountain_thickness), direction=random() * pi)
@@ -206,29 +223,30 @@ class Terrain:
         self.fill_with("C")
 
 
-def display_colored_board(screen, board, width, height, size_x, size_y):
-    terrains = {
-        "S": Color(20, 196, 250),            # "Mer"
-        "E": Color(162, 224, 242),             # Etang
-        "M": Color(74, 43,5),        # "Montagne"
-        "F": Color(5, 74, 48),          # Forêt
-        "B": Color(8,196, 55),         # Bois
-        "P": Color(194, 240, 43),           # "Prairie",
-        "C": Color(222, 209, 109),          # "Champs",
-        "X": Color(100, 75, 10),        # Falaises
-        "G": Color(252, 236, 88),       # Plage
-        "R": Color(255, 255, 255),        # Road
-        "V": Color(255, 0, 0),  # City
-    }
-    f_x, f_y = int(size_x / width), int(size_y / height)
-    for r, line in enumerate(board):
-        for c, cell in enumerate(line):
-            rect = Rect(c * f_x, r * f_y, f_x, f_y)
-            pygame.draw.rect(screen, terrains[cell], rect)
-
-
 if __name__ == "__main__":
     import pygame
+
+    def display_colored_board(screen, board, width, height, size_x, size_y):
+        terrains = {
+            "S": Color(20, 196, 250),  # "Mer"
+            "E": Color(162, 224, 242),  # Etang
+            "M": Color(74, 43, 5),  # "Montagne"
+            "F": Color(5, 74, 48),  # Forêt
+            "B": Color(8, 196, 55),  # Bois
+            "P": Color(194, 240, 43),  # "Prairie",
+            "C": Color(222, 209, 109),  # "Champs",
+            "X": Color(100, 75, 10),  # Falaises
+            "G": Color(252, 236, 88),  # Plage
+            "R": Color(255, 255, 255),  # Road
+            "V": Color(255, 0, 0),  # City
+        }
+        f_x, f_y = int(size_x / width), int(size_y / height)
+        for r, line in enumerate(board):
+            for c, cell in enumerate(line):
+                rect = Rect(c * f_x, r * f_y, f_x, f_y)
+                pygame.draw.rect(screen, terrains[cell], rect)
+
+
     terrain = Terrain()
     terrain.generate_island()
     a_board = terrain.get_board()

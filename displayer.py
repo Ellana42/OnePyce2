@@ -10,8 +10,10 @@ class Display:
         self.obstacle = '田'
         self.object = '圓'
         self.npc = '人'
+        self.sea = '~~'
 
     def display_map(self, events):
+        board = self.world.board
         h, w = self.height, self.width
         player_icon = self.world.crew.get_nakama().get_icon()
 
@@ -41,7 +43,11 @@ class Display:
                     nakama = self.world.new_nakamas[x, y]
                     print(Nakama.get_nakama_skin()[type(nakama)], end='')
                 else:
-                    print(self.empty_space, end='')
+                    cell = board[y][x]
+                    if cell == "S":
+                        print(self.sea, end='')
+                    else:
+                        print(self.empty_space, end='')
             print("  |")
 
         print('＿' * (w + 2))
