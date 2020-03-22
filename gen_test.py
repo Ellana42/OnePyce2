@@ -8,6 +8,7 @@ import pygame
 # from pygame.locals import *
 from pygame import Rect, Color
 
+
 def init_board(width, height):
     return [[0 for _ in range(width)] for _ in range(height)]
 
@@ -245,6 +246,7 @@ def display_colored_board(screen, board, size_x, size_y):
         for c, cell in enumerate(line):
             rect = Rect(c * f_x, r * f_y, f_x, f_y)
             pygame.draw.rect(screen, terrains[cell], rect)
+
 
 pygame.init()
 screen_size = 800
