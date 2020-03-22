@@ -50,7 +50,7 @@ class Crew:
             self.die_from_exhaustion()
             return ['That was too much ! I\'m going to rest for a bit ...']
         else:
-            return ['This is mighty tiring !']
+            return []
 
     def die_from_exhaustion(self):
         self.x = 0

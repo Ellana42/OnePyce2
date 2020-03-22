@@ -22,4 +22,9 @@ class Combat:
         self.player = player
         self.enemy = enemy
 
+    def start_combat(self):
+
+
+
+
 

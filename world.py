@@ -82,7 +82,8 @@ class World:
     def is_nakama(self, x, y):
         return (x, y) in self.new_nakamas
 
-    def is_enemy(self):
+    def is_enemy(self, x, y):
+        return (x, y) in self.enemies
 
     # TODO modify with terrain generation
     def get_terrain(self, x, y):
@@ -115,12 +116,11 @@ class World:
     def movement_consequences(self, direction):
         consequence = []
         x, y = self.wanna_go(direction)
-        if self.is_outside(x, y) or self.is_obstacle(x, y):
+        if self.is_outside(x, y) or self.is_obstacle(x, y) or self.is_enemy(x, y):
             consequence.append('Ouch ! Can\'t go there !')
         elif self.is_npc(x, y):
             consequence.append(self.npc[x, y].talk())
         else:
-            consequence.append('Let\'s go there')
             self.crew.move_to(x, y)
             consequence.extend(self.crew.gets_tired(self.get_terrain(x, y)))
         if self.is_object(x, y):
