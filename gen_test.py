@@ -34,6 +34,7 @@ def get_random_positions(board, number):
                 break
     return positions
 
+
 def put_random_obstacles(board, what, number):
     width, height = get_board_dimension(board)
     for _ in range(number):
