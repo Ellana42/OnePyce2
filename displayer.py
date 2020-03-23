@@ -47,7 +47,7 @@ class Display:
                     print(self.enemy, end='')
                 else:
                     cell = board[y][x]
-                    if cell == "S":
+                    if cell == "S" or cell == 'E':
                         print(self.sea, end='')
                     else:
                         print(self.empty_space, end='')

@@ -108,7 +108,7 @@ class Luffy(Nakama):
         if location["type"] == "Mountain":
             return 3
         if location["type"] == "Water":
-            return 100
+            return 1  # TODO to change back
         return super().get_nakama_tiredness_for(location)
 
 

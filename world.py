@@ -7,21 +7,18 @@ from terrain import Terrain
 
 class World:
 
-    def __init__(self, width=10, height=10):
+    def __init__(self):
         self.items = {}
         self.npc = {}
         self.enemies = {}
         self.new_nakamas = {}
         self.obstacles = set()
-        self.width = width
-        self.height = height
         self.crew = Crew()
         self.combat_system = CombatSystem(self, self.crew)
         self.board = None
         self.random_map_generator()
 
     # World generation --------------------------------
-
 
     def empty_spot(self, only_on=None, avoids=None):
         while True:
@@ -50,7 +47,7 @@ class World:
 
     def add_enemies(self, nb_enemies):
         for _ in range(nb_enemies):
-            x, y = self.empty_spot()
+            x, y = self.empty_spot(avoids='SE')
             self.enemies[x, y] = Enemy(x, y)
 
     def add_future_nakamas(self, possible_nakamas):
@@ -67,6 +64,8 @@ class World:
         self.add_npc(nb_npc)
         self.add_enemies(nb_enemies)
         self.add_future_nakamas(Nakama.get_possible_nakamas())
+        self.width = world.width
+        self.height = world.height
         x, y = self.empty_spot(only_on="PCGRV")
         self.crew.move_to(x, y)
 
@@ -101,7 +100,6 @@ class World:
     def is_enemy(self, x, y):
         return (x, y) in self.enemies
 
-    # TODO modify with terrain generation
     def get_terrain(self, x, y):
         return self.board[y][x]
 

@@ -1,7 +1,7 @@
 from world import World
 from displayer import Display
 
-my_map = World(10, 10)
+my_map = World()
 my_display = Display(my_map)
 
 my_display.display_map([])

@@ -25,15 +25,16 @@ class CombatSystem:
         self.crew = crew
 
     def start_combat(self, enemies):
-        fighter_name = input('A combat has started, who will fight ? Type your fighter\'s name : ')
-        if not self.crew.is_in_the_crew(fighter_name):
-            input('This is not a valid fighter ! Try again : ')
+        fighter = input('A combat has started, who will fight ? Type your fighter\'s name : ')
+        while not self.crew.is_in_the_crew(fighter):
+            fighter = input('This is not a valid fighter ! Try again : ')
 
         for enemy in enemies:
-            self.individual_fight(enemy)
+            self.individual_fight(fighter, enemy)
 
-    def individual_fight(self, enemy):
-        pass
+    def individual_fight(self, fighter, enemy):
+            pass
+
 
 
 
