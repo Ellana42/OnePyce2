@@ -60,6 +60,10 @@ class Crew:
     def add_nakama(self, nakama):
         self.crew.append(nakama)
 
+    def is_in_the_crew(self, name):
+        name_list = [nakama.name for nakama in self.crew]
+        return name in name_list
+
 
 class Nakama:
     def __init__(self):
@@ -90,6 +94,7 @@ class Luffy(Nakama):
         super().__init__()
         self.icon = 'L '
         self.tiredness = {'ground': 1, 'mountain': 3, 'water': 100}
+        self.name = 'Luffy'
 
 
 class Nami(Nakama):
@@ -97,6 +102,8 @@ class Nami(Nakama):
         super().__init__()
         self.icon = 'N '
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
+        self.name = 'Nami'
+
 
 
 class Zorro(Nakama):
@@ -104,6 +111,7 @@ class Zorro(Nakama):
         super().__init__()
         self.icon = 'Z '
         self.tiredness = {'ground': 10, 'mountain': 10, 'water': 10}
+        self.name = 'Zorro'
 
 
 class Usopp(Nakama):
@@ -111,6 +119,8 @@ class Usopp(Nakama):
         super().__init__()
         self.icon = 'U '
         self.tiredness = {'ground': 20, 'mountain': 20, 'water': 10}
+        self.name = 'Usopp'
+
 
 
 class Sanji(Nakama):
@@ -118,3 +128,5 @@ class Sanji(Nakama):
         super().__init__()
         self.icon = 'S '
         self.tiredness = {'ground': 1, 'mountain': 5, 'water': 10}
+        self.name = 'Sanji'
+

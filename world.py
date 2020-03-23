@@ -1,12 +1,12 @@
 from random import randrange
 from item import Food, Npc
-from crew import Nakama
-from combat_system import Enemy
+from crew import Nakama, Crew
+from combat_system import Enemy, CombatSystem
 
 
 class World:
 
-    def __init__(self, crew, width=10, height=10):
+    def __init__(self, width=10, height=10):
         self.items = {}
         self.npc = {}
         self.enemies = {}
@@ -14,7 +14,8 @@ class World:
         self.obstacles = set()
         self.width = width
         self.height = height
-        self.crew = crew
+        self.crew = Crew()
+        self.combat_system = CombatSystem(self, self.crew)
         self.random_map_generator()
 
     # World generation --------------------------------
@@ -47,7 +48,7 @@ class World:
         for nakama in possible_nakamas:
             self.new_nakamas[self.empty_spot()] = nakama
 
-    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=1):
+    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=3):
         self.add_obstacles(nb_obstacles)
         self.add_items(nb_items)
         self.add_npc(nb_npc)
@@ -99,9 +100,12 @@ class World:
 
     def starts_combat(self, x, y):
         combat = False
+        enemies = []
         for enemy in self.enemies.values():
-            combat += enemy.is_in_range(x, y)
-        return combat
+            if enemy.is_in_range(x, y):
+                combat += True
+                enemies.append(enemy)
+        return combat, enemies
 
     def update_world_and_events(self, key):
         events = []
@@ -129,6 +133,7 @@ class World:
         elif self.is_nakama(x, y):
             self.get_new_nakama((x, y), self.new_nakamas[x, y])
             consequence.append('Hurray ! We\'ve got a new Nakama !')
-        if self.starts_combat(x, y):
-            consequence.append('You started a combat!')
+        if self.starts_combat(x, y)[0]:
+            enemies = self.starts_combat(x, y)[1]
+            consequence.append(self.combat_system.start_combat(enemies))
         return consequence

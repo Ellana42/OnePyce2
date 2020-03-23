@@ -1,3 +1,5 @@
+from crew import Crew
+
 
 class Enemy:
     def __init__(self, x, y):
@@ -17,12 +19,21 @@ class Enemy:
         return abs(self.x - x) <= self.attack_range and abs(self.y - y) <= self.attack_range
 
 
-class Combat:
-    def __init__(self, player, enemy):
-        self.player = player
-        self.enemy = enemy
+class CombatSystem:
+    def __init__(self, world, crew):
+        self.world = world
+        self.crew = crew
 
-    def start_combat(self):
+    def start_combat(self, enemies):
+        fighter_name = input('A combat has started, who will fight ? Type your fighter\'s name : ')
+        if not self.crew.is_in_the_crew(fighter_name):
+            input('This is not a valid fighter ! Try again : ')
+
+        for enemy in enemies:
+            self.individual_fight(enemy)
+
+    def individual_fight(self, enemy):
+        pass
 
 
 
