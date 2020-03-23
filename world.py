@@ -2,6 +2,7 @@ from random import randrange
 from item import Food, Npc
 from crew import Nakama, Crew
 from combat_system import Enemy, CombatSystem
+from terrain import Terrain
 
 
 class World:
@@ -16,28 +17,36 @@ class World:
         self.height = height
         self.crew = Crew()
         self.combat_system = CombatSystem(self, self.crew)
+        self.board = None
         self.random_map_generator()
 
     # World generation --------------------------------
 
-    def empty_spot(self):
-        occupied_slots = self.items.keys() | self.npc.keys() | self.enemies.keys() | self.obstacles | self.new_nakamas.keys()
+
+    def empty_spot(self, only_on=None, avoids=None):
         while True:
-            random_coordinates = randrange(self.width), randrange(self.height)
-            if random_coordinates not in occupied_slots:
+            c, r = random_coordinates = randrange(self.width), randrange(self.height)
+            if only_on is not None:
+                if self.board[r][c] not in only_on:
+                    continue
+            if avoids is not None:
+                if self.board[r][c] in avoids:
+                    continue
+            if random_coordinates not in self.obstacles and random_coordinates not in self.items \
+                    and random_coordinates not in self.npc:
                 return random_coordinates
 
     def add_obstacles(self, nb_obstacles):
         for _ in range(nb_obstacles):
-            self.obstacles.add(self.empty_spot())
+            self.obstacles.add(self.empty_spot(avoids="SE"))
 
     def add_items(self, nb_items):
         for _ in range(nb_items):
-            self.items[self.empty_spot()] = Food()
+            self.items[self.empty_spot(avoids="SE")] = Food()  # All items are food for now
 
     def add_npc(self, nb_npc):
         for _ in range(nb_npc):
-            self.npc[self.empty_spot()] = Npc()
+            self.npc[self.empty_spot(avoids="SE")] = Npc()
 
     def add_enemies(self, nb_enemies):
         for _ in range(nb_enemies):
@@ -46,14 +55,20 @@ class World:
 
     def add_future_nakamas(self, possible_nakamas):
         for nakama in possible_nakamas:
-            self.new_nakamas[self.empty_spot()] = nakama
+            self.new_nakamas[self.empty_spot(only_on="PCGRV")] = nakama
 
     def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=3):
+        world: Terrain = Terrain()
+        world.generate_island()
+        self.board = world.get_board()
+        self.width, self.height = world.get_dimensions()
         self.add_obstacles(nb_obstacles)
         self.add_items(nb_items)
         self.add_npc(nb_npc)
         self.add_enemies(nb_enemies)
         self.add_future_nakamas(Nakama.get_possible_nakamas())
+        x, y = self.empty_spot(only_on="PCGRV")
+        self.crew.move_to(x, y)
 
     # Movement mechanics --------------------------------
     def wanna_go(self, direction):
@@ -88,7 +103,7 @@ class World:
 
     # TODO modify with terrain generation
     def get_terrain(self, x, y):
-        return 'ground'
+        return self.board[y][x]
 
     def take_object(self, object_coordinates, item):
         self.crew.take_item(item)

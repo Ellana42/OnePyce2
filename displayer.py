@@ -11,8 +11,10 @@ class Display:
         self.object = '圓'
         self.npc = '人'
         self.enemy = '力'
+        self.sea = '~~'
 
     def display_map(self, events):
+        board = self.world.board
         h, w = self.height, self.width
         player_icon = self.world.crew.get_nakama().get_icon()
 
@@ -44,7 +46,11 @@ class Display:
                 elif (x, y) in self.world.enemies:
                     print(self.enemy, end='')
                 else:
-                    print(self.empty_space, end='')
+                    cell = board[y][x]
+                    if cell == "S":
+                        print(self.sea, end='')
+                    else:
+                        print(self.empty_space, end='')
             print("  |")
 
         print('＿' * (w + 2))

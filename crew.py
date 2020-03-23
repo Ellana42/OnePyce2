@@ -1,4 +1,5 @@
 from item import Food
+import terrain
 
 
 class Crew:
@@ -44,8 +45,8 @@ class Crew:
     def get_crew(self):
         return self.crew
 
-    def gets_tired(self, terrain):
-        self.energy_level -= self.crew[self.current_nakama].tiredness[terrain]
+    def gets_tired(self, location):
+        self.energy_level -= self.crew[self.current_nakama].get_tiredness(location)
         if self.energy_level <= 0:
             self.die_from_exhaustion()
             return ['That was too much ! I\'m going to rest for a bit ...']
@@ -70,15 +71,23 @@ class Nakama:
         self.icon = ' '
         self.tiredness = {}
         self.standard_tiredness = 1
+        self.terrains_characteristics = {}
+        # Get the terrains descriptions and add a default value for tiredness
+        for terrain_id, description in terrain.Terrain.get_terrains().items():
+            if "tiredness" not in description:
+                description["tiredness"] = self.standard_tiredness
+            self.terrains_characteristics[terrain_id] = description
 
     def get_icon(self):
         return self.icon
 
-    def get_tiredness(self, terrain):
-        if terrain in self.tiredness:
-            return self.tiredness[terrain]
-        else:
+    def get_nakama_tiredness_for(self, location_characteristics):
+        return location_characteristics['tiredness']
+
+    def get_tiredness(self, location):
+        if location not in self.terrains_characteristics:
             return self.standard_tiredness
+        return self.get_nakama_tiredness_for(self.terrains_characteristics[location])
 
     @classmethod
     def get_possible_nakamas(cls):
@@ -93,40 +102,79 @@ class Luffy(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'L '
-        self.tiredness = {'ground': 1, 'mountain': 3, 'water': 100}
         self.name = 'Luffy'
+
+    def get_nakama_tiredness_for(self, location):
+        if location["type"] == "Mountain":
+            return 3
+        if location["type"] == "Water":
+            return 100
+        return super().get_nakama_tiredness_for(location)
 
 
 class Nami(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'N '
+        self.tiredness = {'X': 10, 'M': 10, 'S': 1, 'E': 1}
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
         self.name = 'Nami'
 
+
+    def get_nakama_tiredness_for(self, location):
+        if location["type"] == "Ground":
+            return 3
+        if location["type"] == "Mountain":
+            return 10
+        if location["type"] == "Water":
+            return 1
+        return super().get_nakama_tiredness_for(location)
 
 
 class Zorro(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'Z '
-        self.tiredness = {'ground': 10, 'mountain': 10, 'water': 10}
         self.name = 'Zorro'
+
+    def get_nakama_tiredness_for(self, location):
+        if location["type"] == "Ground":
+            return 3
+        if location["type"] == "Mountain":
+            return 10
+        if location["type"] == "Water":
+            return 1
+        return super().get_nakama_tiredness_for(location)
 
 
 class Usopp(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'U '
-        self.tiredness = {'ground': 20, 'mountain': 20, 'water': 10}
         self.name = 'Usopp'
 
+    def get_nakama_tiredness_for(self, location):
+        if location["type"] == "Ground":
+            return 3
+        if location["type"] == "Mountain":
+            return 10
+        if location["type"] == "Water":
+            return 1
+        return super().get_nakama_tiredness_for(location)
 
 
 class Sanji(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'S '
-        self.tiredness = {'ground': 1, 'mountain': 5, 'water': 10}
         self.name = 'Sanji'
+
+    def get_nakama_tiredness_for(self, location):
+        if location["type"] == "Ground":
+            return 3
+        if location["type"] == "Mountain":
+            return 10
+        if location["type"] == "Water":
+            return 1
+        return super().get_nakama_tiredness_for(location)
 
