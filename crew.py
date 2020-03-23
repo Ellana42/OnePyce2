@@ -51,7 +51,7 @@ class Crew:
             self.die_from_exhaustion()
             return ['That was too much ! I\'m going to rest for a bit ...']
         else:
-            return ['This is mighty tiring !']
+            return []
 
     def die_from_exhaustion(self):
         self.x = 0
@@ -60,6 +60,10 @@ class Crew:
 
     def add_nakama(self, nakama):
         self.crew.append(nakama)
+
+    def is_in_the_crew(self, name):
+        name_list = [nakama.name for nakama in self.crew]
+        return name in name_list
 
 
 class Nakama:
@@ -98,6 +102,7 @@ class Luffy(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'L '
+        self.name = 'Luffy'
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Mountain":
@@ -113,6 +118,8 @@ class Nami(Nakama):
         self.icon = 'N '
         self.tiredness = {'X': 10, 'M': 10, 'S': 1, 'E': 1}
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
+        self.name = 'Nami'
+
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -128,6 +135,7 @@ class Zorro(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'Z '
+        self.name = 'Zorro'
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -143,6 +151,7 @@ class Usopp(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'U '
+        self.name = 'Usopp'
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -158,6 +167,7 @@ class Sanji(Nakama):
     def __init__(self):
         super().__init__()
         self.icon = 'S '
+        self.name = 'Sanji'
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -168,5 +178,3 @@ class Sanji(Nakama):
             return 1
         return super().get_nakama_tiredness_for(location)
 
-
-print({nakama: nakama.icon for nakama in Nakama.get_possible_nakamas()})

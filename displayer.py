@@ -10,6 +10,7 @@ class Display:
         self.obstacle = '田'
         self.object = '圓'
         self.npc = '人'
+        self.enemy = '力'
         self.sea = '~~'
 
     def display_map(self, events):
@@ -42,6 +43,8 @@ class Display:
                 elif (x, y) in self.world.new_nakamas:
                     nakama = self.world.new_nakamas[x, y]
                     print(Nakama.get_nakama_skin()[type(nakama)], end='')
+                elif (x, y) in self.world.enemies:
+                    print(self.enemy, end='')
                 else:
                     cell = board[y][x]
                     if cell == "S":

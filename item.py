@@ -24,3 +24,5 @@ class Npc:
 
     def talk(self):
         return str(self.id_number) + '=' * 10 + ' Good morning peasant ! ' + '=' * 10
+
+

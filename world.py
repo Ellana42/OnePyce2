@@ -1,23 +1,27 @@
 from random import randrange
 from item import Food, Npc
-from crew import Nakama
+from crew import Nakama, Crew
+from combat_system import Enemy, CombatSystem
 from terrain import Terrain
 
 
 class World:
 
-    def __init__(self, crew, width=10, height=10):
+    def __init__(self, width=10, height=10):
         self.items = {}
         self.npc = {}
+        self.enemies = {}
+        self.new_nakamas = {}
         self.obstacles = set()
         self.width = width
         self.height = height
-        self.crew = crew
-        self.new_nakamas = {}
+        self.crew = Crew()
+        self.combat_system = CombatSystem(self, self.crew)
         self.board = None
         self.random_map_generator()
 
     # World generation --------------------------------
+
 
     def empty_spot(self, only_on=None, avoids=None):
         while True:
@@ -33,22 +37,27 @@ class World:
                 return random_coordinates
 
     def add_obstacles(self, nb_obstacles):
-        while len(self.obstacles) < nb_obstacles:
+        for _ in range(nb_obstacles):
             self.obstacles.add(self.empty_spot(avoids="SE"))
 
     def add_items(self, nb_items):
-        while len(self.items) < nb_items:
+        for _ in range(nb_items):
             self.items[self.empty_spot(avoids="SE")] = Food()  # All items are food for now
 
     def add_npc(self, nb_npc):
-        while len(self.npc) < nb_npc:
+        for _ in range(nb_npc):
             self.npc[self.empty_spot(avoids="SE")] = Npc()
+
+    def add_enemies(self, nb_enemies):
+        for _ in range(nb_enemies):
+            x, y = self.empty_spot()
+            self.enemies[x, y] = Enemy(x, y)
 
     def add_future_nakamas(self, possible_nakamas):
         for nakama in possible_nakamas:
             self.new_nakamas[self.empty_spot(only_on="PCGRV")] = nakama
 
-    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2):
+    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=3):
         world: Terrain = Terrain()
         world.generate_island()
         self.board = world.get_board()
@@ -56,6 +65,7 @@ class World:
         self.add_obstacles(nb_obstacles)
         self.add_items(nb_items)
         self.add_npc(nb_npc)
+        self.add_enemies(nb_enemies)
         self.add_future_nakamas(Nakama.get_possible_nakamas())
         x, y = self.empty_spot(only_on="PCGRV")
         self.crew.move_to(x, y)
@@ -88,6 +98,9 @@ class World:
     def is_nakama(self, x, y):
         return (x, y) in self.new_nakamas
 
+    def is_enemy(self, x, y):
+        return (x, y) in self.enemies
+
     # TODO modify with terrain generation
     def get_terrain(self, x, y):
         return self.board[y][x]
@@ -99,6 +112,15 @@ class World:
     def get_new_nakama(self, nakama_coordinates, nakama):
         self.crew.add_nakama(nakama)
         del self.new_nakamas[nakama_coordinates]
+
+    def starts_combat(self, x, y):
+        combat = False
+        enemies = []
+        for enemy in self.enemies.values():
+            if enemy.is_in_range(x, y):
+                combat += True
+                enemies.append(enemy)
+        return combat, enemies
 
     def update_world_and_events(self, key):
         events = []
@@ -113,18 +135,20 @@ class World:
     def movement_consequences(self, direction):
         consequence = []
         x, y = self.wanna_go(direction)
-        if self.is_outside(x, y) or self.is_obstacle(x, y):
+        if self.is_outside(x, y) or self.is_obstacle(x, y) or self.is_enemy(x, y):
             consequence.append('Ouch ! Can\'t go there !')
         elif self.is_npc(x, y):
             consequence.append(self.npc[x, y].talk())
         else:
-            consequence.append('Let\'s go there')
             self.crew.move_to(x, y)
             consequence.extend(self.crew.gets_tired(self.get_terrain(x, y)))
         if self.is_object(x, y):
             self.take_object((x, y), self.items[(x, y)])
             consequence.append('Object picked up !')
         elif self.is_nakama(x, y):
-            self.get_new_nakama((x,y), self.new_nakamas[x, y])
+            self.get_new_nakama((x, y), self.new_nakamas[x, y])
             consequence.append('Hurray ! We\'ve got a new Nakama !')
+        if self.starts_combat(x, y)[0]:
+            enemies = self.starts_combat(x, y)[1]
+            consequence.append(self.combat_system.start_combat(enemies))
         return consequence
