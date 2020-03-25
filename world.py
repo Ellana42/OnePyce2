@@ -17,6 +17,7 @@ class World:
         self.combat_system = CombatSystem(self, self.crew)
         self.board = None
         self.random_map_generator()
+        self.combat_mode = False
 
     # World generation --------------------------------
 
@@ -149,5 +150,10 @@ class World:
             consequence.append('Hurray ! We\'ve got a new Nakama !')
         if self.starts_combat(x, y)[0]:
             enemies = self.starts_combat(x, y)[1]
-            consequence.extend(['A combat has started, who will fight ? ', self.combat_mode(enemies)])
+            self.combat_mode = True
+            fighter = self.crew.get_corresponding_crew_member('Luffy')
+            consequence.append('A combat has started')
         return consequence
+
+
+# , self.combat_system.combat_mode(fighter, enemies)]

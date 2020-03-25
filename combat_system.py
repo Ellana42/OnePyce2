@@ -1,6 +1,3 @@
-from crew import Crew
-from main_code import get_fighter
-
 
 class Enemy:
     def __init__(self, x, y):
@@ -33,13 +30,13 @@ class CombatSystem:
         self.world = world
         self.crew = crew
 
-    def combat_mode(self, enemies):
+    def combat_mode(self, fighter, enemies):
         for enemy in enemies:
             while enemy.health > 0:
-                fighter = get_fighter()
                 self.individual_fight(fighter, enemy)
                 if fighter.health <= 0:
                     self.crew.respawn(fighter)
+            self.world.combat_mode = False
         return []
 
     def individual_fight(self, fighter, enemy):
