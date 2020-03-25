@@ -65,6 +65,13 @@ class Crew:
         name_list = [nakama.name for nakama in self.crew]
         return name in name_list
 
+    def get_corresponding_crew_member(self, name):
+        crew_names = {nakama.name: nakama for nakama in self.crew}
+        return crew_names[name]
+
+    def respawn(self, fighter):
+        pass
+
 
 class Nakama:
     def __init__(self):
@@ -72,6 +79,15 @@ class Nakama:
         self.tiredness = {}
         self.standard_tiredness = 1
         self.terrains_characteristics = {}
+        self.health = 50
+        self.combat_characteristics = {
+            'close_attack': 10,
+            'range_attack': 10,
+            'morale_attack': 10,
+            'close_defense': 10,
+            'range_defense': 10,
+            'morale_defense': 10
+        }
         # Get the terrains descriptions and add a default value for tiredness
         for terrain_id, description in terrain.Terrain.get_terrains().items():
             if "tiredness" not in description:
@@ -88,6 +104,8 @@ class Nakama:
         if location not in self.terrains_characteristics:
             return self.standard_tiredness
         return self.get_nakama_tiredness_for(self.terrains_characteristics[location])
+
+
 
     @classmethod
     def get_possible_nakamas(cls):
@@ -119,7 +137,6 @@ class Nami(Nakama):
         self.tiredness = {'X': 10, 'M': 10, 'S': 1, 'E': 1}
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
         self.name = 'Nami'
-
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -177,4 +194,3 @@ class Sanji(Nakama):
         if location["type"] == "Water":
             return 1
         return super().get_nakama_tiredness_for(location)
-

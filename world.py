@@ -72,13 +72,13 @@ class World:
     # Movement mechanics --------------------------------
     def wanna_go(self, direction):
         x, y = self.crew.get_position()
-        if direction == 'z':
+        if direction == 'up':
             y -= 1
-        elif direction == 'q':
+        elif direction == 'left':
             x -= 1
-        elif direction == 's':
+        elif direction == 'down':
             y += 1
-        elif direction == 'd':
+        elif direction == 'right':
             x += 1
         return x, y
 
@@ -120,13 +120,14 @@ class World:
                 enemies.append(enemy)
         return combat, enemies
 
-    def update_world_and_events(self, key):
+    def update(self, command):
         events = []
-        if key in 'zqsd':
-            events.extend(self.movement_consequences(key))
-        elif key == 'e':
+        directions = ['left', 'right', 'down', 'up']
+        if command in directions:
+            events.extend(self.movement_consequences(command))
+        elif command == 'switch':
             events.extend(self.crew.switch_nakama())
-        elif key == 'i':
+        elif command == 'item':
             events.extend(self.crew.use_item())
         return events
 
@@ -148,5 +149,5 @@ class World:
             consequence.append('Hurray ! We\'ve got a new Nakama !')
         if self.starts_combat(x, y)[0]:
             enemies = self.starts_combat(x, y)[1]
-            consequence.append(self.combat_system.start_combat(enemies))
+            consequence.extend(['A combat has started, who will fight ? ', self.combat_mode(enemies)])
         return consequence
