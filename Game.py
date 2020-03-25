@@ -10,22 +10,39 @@ class Game:
         self.world = World()
         self.display = Display(self.world)
         self.current_state = self.movement
+        self.running = True
+
+    # Main code :
 
     def main_loop(self):
-        while True:
+        while self.running:
             self.current_state()
 
+    def switch_state(self, new_state):
+        self.current_state = new_state
+
+    # Different states :
+
     def combat(self):
-        fighter = self.get_fighter()
-        pass
+        while len(self.world.current_enemies) > 0:
+            for enemy in self.world.current_enemies:
+                fighter = self.get_fighter()
+                self.world.fight(fighter, enemy)
+                if fighter == 'quit':
+                    self.running = False
+        self.switch_state(self.movement)
 
     def movement(self):
         direction = self.get_input()
+        if direction == 'quit':
+            self.running = False
         events = self.world.update(direction)
         self.display.display_map(events)
         for event in events:
             if event == 'A combat has started':
                 self.switch_state(self.combat)
+
+    # Get input functions
 
     def input_to_event(self, key):
         return self.input_translation[key]
@@ -39,24 +56,7 @@ class Game:
     def get_fighter(self):
         while True:
             name_input = input('Who will fight ? ')
-            if name_input in self.world.crew.is_in_the_crew(name_input):
+            if self.world.crew.is_in_the_crew(name_input):
                 return self.world.crew.get_corresponding_crew_member(name_input)
-
-    def switch_state(self, new_state):
-        self.current_state = new_state
-
-
-    '''def start_game(self):
-        running = True
-        self.display.display_map(events=[])
-        while running:
-            command = self.input_to_event(self.get_input())
-            if command == 'quit':
-                running = False
-                break
-            while self.world.combat_mode:
-                fighter = self.get_fighter()
-                events = self.world.update(fighter)
-
-            events = self.world.update(command)
-            self.display.display_map(events)'''
+            elif name_input == 'x':
+                return 'quit'

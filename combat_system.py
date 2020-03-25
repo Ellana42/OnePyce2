@@ -30,14 +30,13 @@ class CombatSystem:
         self.world = world
         self.crew = crew
 
-    def combat_mode(self, fighter, enemies):
+    '''def combat_mode(self, fighter, enemies):
         for enemy in enemies:
             while enemy.health > 0:
                 self.individual_fight(fighter, enemy)
                 if fighter.health <= 0:
                     self.crew.respawn(fighter)
-            self.world.combat_mode = False
-        return []
+            self.world.combat_mode = False'''
 
     def individual_fight(self, fighter, enemy):
         fighter_stats = fighter.combat_characteristics
@@ -52,8 +51,7 @@ class CombatSystem:
 
         enemy.health += enemy_hurt if enemy_hurt < 0 else 0
         fighter.health += fighter_hurt if fighter_hurt < 0 else 0
-        print('The enemy still has ' + str(enemy.health) + ' health points.')
-        print('You still have ' + str(fighter.health) + ' health points.')
+
 
 
 

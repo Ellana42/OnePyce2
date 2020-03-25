@@ -54,6 +54,5 @@ class Display:
             print("  |")
 
         print('＿' * (w + 2))
-
         for event in events:
             print(event)

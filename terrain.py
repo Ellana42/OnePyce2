@@ -2,7 +2,7 @@ from random import randrange, random, seed, choices, shuffle
 from math import sin, cos, pi, fabs, sqrt
 import copy
 
-from pygame import Rect, Color
+#from pygame import Rect, Color
 
 
 class Terrain:
