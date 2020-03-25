@@ -17,7 +17,7 @@ class Game:
 
     def combat(self):
         fighter = self.get_fighter()
-
+        pass
 
     def movement(self):
         direction = self.get_input()
@@ -25,7 +25,7 @@ class Game:
         self.display.display_map(events)
         for event in events:
             if event == 'A combat has started':
-                self.switch_state(combat)
+                self.switch_state(self.combat)
 
     def input_to_event(self, key):
         return self.input_translation[key]
@@ -34,7 +34,7 @@ class Game:
         while True:
             key = input("Input: ").lower()
             if key in self.input_translation:
-                return key
+                return self.input_translation[key]
 
     def get_fighter(self):
         while True:

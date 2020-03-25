@@ -119,7 +119,7 @@ class Nakama:
 class Luffy(Nakama):
     def __init__(self):
         super().__init__()
-        self.icon = 'L '
+        self.icon = 'L'
         self.name = 'Luffy'
 
     def get_nakama_tiredness_for(self, location):
@@ -133,7 +133,7 @@ class Luffy(Nakama):
 class Nami(Nakama):
     def __init__(self):
         super().__init__()
-        self.icon = 'N '
+        self.icon = 'N'
         self.tiredness = {'X': 10, 'M': 10, 'S': 1, 'E': 1}
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
         self.name = 'Nami'
@@ -151,7 +151,7 @@ class Nami(Nakama):
 class Zorro(Nakama):
     def __init__(self):
         super().__init__()
-        self.icon = 'Z '
+        self.icon = 'Z'
         self.name = 'Zorro'
 
     def get_nakama_tiredness_for(self, location):
@@ -167,7 +167,7 @@ class Zorro(Nakama):
 class Usopp(Nakama):
     def __init__(self):
         super().__init__()
-        self.icon = 'U '
+        self.icon = 'U'
         self.name = 'Usopp'
 
     def get_nakama_tiredness_for(self, location):
@@ -183,7 +183,7 @@ class Usopp(Nakama):
 class Sanji(Nakama):
     def __init__(self):
         super().__init__()
-        self.icon = 'S '
+        self.icon = 'S'
         self.name = 'Sanji'
 
     def get_nakama_tiredness_for(self, location):
