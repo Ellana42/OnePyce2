@@ -7,6 +7,7 @@ from terrain import Terrain
 class World:
 
     def __init__(self):
+        self.width, self.height = None, None
         self.items = {}
         self.npc = {}
         self.enemies = {}
@@ -55,17 +56,15 @@ class World:
             self.new_nakamas[self.empty_spot(only_on="PCGRV")] = nakama
 
     def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=30):  # TODO change nb of enemies
-        world: Terrain = Terrain()
-        world.generate_island()
-        self.board = world.get_board()
-        self.width, self.height = world.get_dimensions()
+        terrain: Terrain = Terrain()
+        terrain.generate_island()
+        self.board = terrain.get_board()
+        self.width, self.height = terrain.get_dimensions()
         self.add_obstacles(nb_obstacles)
         self.add_items(nb_items)
         self.add_npc(nb_npc)
         self.add_enemies(nb_enemies)
         self.add_future_nakamas(Nakama.get_possible_nakamas())
-        self.width = world.width
-        self.height = world.height
         x, y = self.empty_spot(only_on="PCGRV")
         self.crew.move_to(x, y)
 
@@ -180,3 +179,8 @@ class World:
 
         enemy.health += enemy_hurt if enemy_hurt < 0 else 0
         fighter.health += fighter_hurt if fighter_hurt < 0 else 0
+
+    # Discussion with other classes
+
+    def get_dimensions(self):
+        return self.width, self.height

@@ -10,8 +10,8 @@ class Terrain:
     def get_terrains(cls):
         terrains = {
             "S": ("Sea", "Water"),
-            "E": ("Pond","Water"),
-            "M": ("Mountain","Mountain"),
+            "E": ("Pond", "Water"),
+            "M": ("Mountain", "Mountain"),
             "F": ("Forest", "Forest"),
             "B": ("Wood", "Forest"),
             "P": ("Meadows", "Ground"),
@@ -45,8 +45,8 @@ class Terrain:
         for _ in range(number):
             while True:
                 c, r = randrange(width), randrange(height)
-                if board[r][c] == 0 and (c,r) not in positions:
-                    positions.add((c,r))
+                if board[r][c] == 0 and (c, r) not in positions:
+                    positions.add((c, r))
                     break
         return positions
 
@@ -68,21 +68,22 @@ class Terrain:
     def one_pass(self, what, threshold, to_what='', direction=None):
         dir_x, dir_y = 0, 0
         if direction is not None:
-            dir_x , dir_y = cos(direction), sin(direction)
+            dir_x, dir_y = cos(direction), sin(direction)
         previous_board = self.copy_board()
         for r, line in enumerate(previous_board):
             for c, cell in enumerate(line):
                 if cell == what:
-                    for h, v in ((i, j) for i in range(-1, 2) for j in range(-1, 2) if (i,j) != (0,0)):
+                    for h, v in ((i, j) for i in range(-1, 2) for j in range(-1, 2) if (i, j) != (0, 0)):
                         around_r, around_c = r + v, c + h
                         if direction is None:
                             threshold_kept = threshold
                         else:
                             threshold_kept = fabs(h * dir_x + v * dir_y) * threshold
-                        if self.is_inside_board(around_r, around_c) and random() < threshold_kept and self.board[around_r][around_c] == 0:
+                        if self.is_inside_board(around_r, around_c) and random() < threshold_kept and \
+                                self.board[around_r][around_c] == 0:
                             self.board[around_r][around_c] = what if to_what == '' else to_what
 
-    def multiple_pass(self, what, threshold, passes, to_what = '', direction=None):
+    def multiple_pass(self, what, threshold, passes, to_what='', direction=None):
         for _ in range(passes):
             self.one_pass(what, threshold, to_what, direction)
 
@@ -100,21 +101,23 @@ class Terrain:
 
     def draw_road(self, start, end):
         def possible_moves(c, r):
-            return ((h, v) for h,v in {(-1, 0), (1, 0), (0, -1), (0, 1)} if self.board[r + v][c + h] == 0)
+            return ((h, v) for h, v in {(-1, 0), (1, 0), (0, -1), (0, 1)} if self.board[r + v][c + h] == 0)
 
         def junction(c, r):
-            return [(h, v) for h,v in {(-1, 0), (1, 0), (0, -1), (0, 1)} if self.board[r + v][c + h] in ('V', 'R') and (r + v != start[1] or c + h != start[0])]
+            return [(h, v) for h, v in {(-1, 0), (1, 0), (0, -1), (0, 1)} if
+                    self.board[r + v][c + h] in ('V', 'R') and (r + v != start[1] or c + h != start[0])]
+
         path = []
         c, r = start  # Current position
-        c_e, r_e = end # Target position
-        last_h, last_v = 0, 0 # Last move
+        c_e, r_e = end  # Target position
+        last_h, last_v = 0, 0  # Last move
         while c != c_e or r != r_e:
             if len(junction(c, r)) > 0:
                 break
             d = sqrt((c_e - c) ** 2 + (r_e - r) ** 2) - 0.5
             dir_h, dir_v = 0, 0
             if d > 0:
-                dir_h, dir_v = (c_e - c) / d , (r_e - r) /d
+                dir_h, dir_v = (c_e - c) / d, (r_e - r) / d
             weighted_moves_p = {}
             weighted_moves_n = {}
             weighted_moves = {}
@@ -188,19 +191,20 @@ class Terrain:
                 base_city = cities.pop()
 
         # Island shaped creation
-        self.multiple_pass("S", 0.2, 1, to_what="G")   # Plage le long de la mer
+        self.multiple_pass("S", 0.2, 1, to_what="G")  # Plage le long de la mer
         self.multiple_pass("G", 0.05, 4)  # Extension des plages
-        self.multiple_pass("S", 0.05, 1, to_what="X") # Falaise le long de la mer
-        self.multiple_pass("G", 0.05, 1, to_what="X") # Falaise le long du sable
-        self.multiple_pass("X", 0.1, 4, direction=random() * pi) # Extension des falaises
+        self.multiple_pass("S", 0.05, 1, to_what="X")  # Falaise le long de la mer
+        self.multiple_pass("G", 0.05, 1, to_what="X")  # Falaise le long du sable
+        self.multiple_pass("X", 0.1, 4, direction=random() * pi)  # Extension des falaises
 
         # Montains
         island_size = min(self.width, self.height)
         mountain_seeds = int(mountains_factor * island_size // 7)
         mountain_thickness = int(island_size * mountains_thickness) // 4
 
-        self.put_random_obstacles("M", randrange(int(mountain_seeds * 0.8) , mountain_seeds))
-        self.multiple_pass("M", 0.10, randrange(int(mountain_thickness * 0.8), mountain_thickness), direction=random() * pi)
+        self.put_random_obstacles("M", randrange(int(mountain_seeds * 0.8), mountain_seeds))
+        self.multiple_pass("M", 0.10, randrange(int(mountain_thickness * 0.8), mountain_thickness),
+                           direction=random() * pi)
 
         # Forêt jouxtant la montagne
         self.multiple_pass("M", 0.1, 1, "F")  # Départ à partir de la montagne
@@ -224,6 +228,7 @@ class Terrain:
 
 if __name__ == "__main__":
     import pygame
+
 
     def display_colored_board(screen, board, width, height, size_x, size_y):
         terrains = {
@@ -274,4 +279,3 @@ if __name__ == "__main__":
         display_colored_board(screen, a_board, width, height, size_x, size_y)
         pygame.display.flip()
         clock.tick(10)
-
