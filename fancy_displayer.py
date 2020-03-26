@@ -8,10 +8,12 @@ class FancyDisplay:
         self.width, self.height = self.world.get_dimensions()
 
         pygame.init()
-        self.resolution = 16
-        self.size_x, self.size_y = self.width * self.resolution, self.height * self.resolution
+        self.resolution = 32
+        self.vision_width, self.vision_height = 31, 21
+        self.size_x, self.size_y = self.vision_width * self.resolution, self.vision_height * self.resolution
         self.screen = pygame.display.set_mode((self.size_x, self.size_y))
         pygame.display.set_caption('OnePyce terrain generator')
+        self.clock = pygame.time.Clock()
 
         self.grass = pygame.image.load('graphics/terrain/grass.png').convert()
         self.land = pygame.image.load('graphics/terrain/land.png').convert()
@@ -22,21 +24,27 @@ class FancyDisplay:
         self.player = pygame.image.load('graphics/player_icons/luffy.png').convert_alpha()
 
     def display_world(self, events):
-        for y in range(self.height):
-            for x in range(self.width):
-                cell = self.board[y][x]
-                if cell == 'S':
-                    self.screen.blit(self.water, self.convert(x, y))
-                elif cell == 'X':
-                    self.screen.blit(self.mountain, self.convert(x, y))
+        x_p, y_p = self.world.crew.x, self.world.crew.y
+        for v_y in range(self.vision_height):
+            for v_x in range(self.vision_width):
+                x = v_x + x_p - self.vision_width // 2
+                y = v_y + y_p - self.vision_height // 2
+                if x in range(self.width) and y in range(self.height):
+                    cell = self.board[y][x]
                 else:
-                    self.screen.blit(self.grass, self.convert(x, y))
+                    cell = 'S'
+                if cell == 'S':
+                    self.screen.blit(self.water, self.convert(v_x, v_y))
+                elif cell == 'X':
+                    self.screen.blit(self.mountain, self.convert(v_x, v_y))
+                else:
+                    self.screen.blit(self.grass, self.convert(v_x, v_y))
                 if (x, y) in self.world.obstacles:
                     pass
                 elif (x, y) in self.world.npc:
                     pass
-                elif (x, y) == (self.world.crew.x, self.world.crew.y):
-                    self.screen.blit(self.player, self.convert(x, y))
+                elif (x, y) == (x_p, y_p):
+                    self.screen.blit(self.player, self.convert(v_x, v_y))
                 elif (x, y) in self.world.items:
                     pass
                 elif (x, y) in self.world.new_nakamas:
@@ -44,7 +52,9 @@ class FancyDisplay:
                     pass
                 elif (x, y) in self.world.enemies:
                     pass
+
         pygame.display.update()
+        self.clock.tick(10)
 
     def main_loop(self):
         running = True
@@ -63,6 +73,7 @@ class FancyDisplay:
     def get_terrain_graphic(self, x, y):
         terrain_type = self.board[y][x]
         pass
+
 
 
 
