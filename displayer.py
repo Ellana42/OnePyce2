@@ -6,12 +6,12 @@ class Display:
         self.world = world
         self.height = world.height
         self.width = world.width
-        self.empty_space = '　'
-        self.obstacle = '田'
-        self.object = '圓'
-        self.npc = '人'
-        self.enemy = '力'
-        self.sea = '~~'
+        self.empty_space = ' '
+        self.obstacle = 'X'
+        self.object = 'o'
+        self.npc = 'P'
+        self.enemy = 'E'
+        self.sea = '~'
 
     def display_map(self, events):
         board = self.world.board
@@ -47,13 +47,12 @@ class Display:
                     print(self.enemy, end='')
                 else:
                     cell = board[y][x]
-                    if cell == "S":
+                    if cell == "S" or cell == 'E':
                         print(self.sea, end='')
                     else:
                         print(self.empty_space, end='')
             print("  |")
 
         print('＿' * (w + 2))
-
         for event in events:
             print(event)

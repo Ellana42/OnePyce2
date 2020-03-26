@@ -7,21 +7,20 @@ from terrain import Terrain
 
 class World:
 
-    def __init__(self, width=10, height=10):
+    def __init__(self):
         self.items = {}
         self.npc = {}
         self.enemies = {}
         self.new_nakamas = {}
         self.obstacles = set()
-        self.width = width
-        self.height = height
         self.crew = Crew()
         self.combat_system = CombatSystem(self, self.crew)
         self.board = None
         self.random_map_generator()
+        self.combat_mode = False
+        self.current_enemies = []
 
     # World generation --------------------------------
-
 
     def empty_spot(self, only_on=None, avoids=None):
         while True:
@@ -50,14 +49,14 @@ class World:
 
     def add_enemies(self, nb_enemies):
         for _ in range(nb_enemies):
-            x, y = self.empty_spot()
+            x, y = self.empty_spot(avoids='SE')
             self.enemies[x, y] = Enemy(x, y)
 
     def add_future_nakamas(self, possible_nakamas):
         for nakama in possible_nakamas:
             self.new_nakamas[self.empty_spot(only_on="PCGRV")] = nakama
 
-    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=3):
+    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=30):  # TODO change nb of enemies
         world: Terrain = Terrain()
         world.generate_island()
         self.board = world.get_board()
@@ -67,19 +66,21 @@ class World:
         self.add_npc(nb_npc)
         self.add_enemies(nb_enemies)
         self.add_future_nakamas(Nakama.get_possible_nakamas())
+        self.width = world.width
+        self.height = world.height
         x, y = self.empty_spot(only_on="PCGRV")
         self.crew.move_to(x, y)
 
     # Movement mechanics --------------------------------
     def wanna_go(self, direction):
         x, y = self.crew.get_position()
-        if direction == 'z':
+        if direction == 'up':
             y -= 1
-        elif direction == 'q':
+        elif direction == 'left':
             x -= 1
-        elif direction == 's':
+        elif direction == 'down':
             y += 1
-        elif direction == 'd':
+        elif direction == 'right':
             x += 1
         return x, y
 
@@ -101,34 +102,19 @@ class World:
     def is_enemy(self, x, y):
         return (x, y) in self.enemies
 
-    # TODO modify with terrain generation
     def get_terrain(self, x, y):
         return self.board[y][x]
 
-    def take_object(self, object_coordinates, item):
-        self.crew.take_item(item)
-        del self.items[object_coordinates]
+# World changes
 
-    def get_new_nakama(self, nakama_coordinates, nakama):
-        self.crew.add_nakama(nakama)
-        del self.new_nakamas[nakama_coordinates]
-
-    def starts_combat(self, x, y):
-        combat = False
-        enemies = []
-        for enemy in self.enemies.values():
-            if enemy.is_in_range(x, y):
-                combat += True
-                enemies.append(enemy)
-        return combat, enemies
-
-    def update_world_and_events(self, key):
+    def update(self, command):
         events = []
-        if key in 'zqsd':
-            events.extend(self.movement_consequences(key))
-        elif key == 'e':
+        directions = ['left', 'right', 'down', 'up']
+        if command in directions:
+            events.extend(self.movement_consequences(command))
+        elif command == 'switch':
             events.extend(self.crew.switch_nakama())
-        elif key == 'i':
+        elif command == 'item':
             events.extend(self.crew.use_item())
         return events
 
@@ -149,6 +135,33 @@ class World:
             self.get_new_nakama((x, y), self.new_nakamas[x, y])
             consequence.append('Hurray ! We\'ve got a new Nakama !')
         if self.starts_combat(x, y)[0]:
-            enemies = self.starts_combat(x, y)[1]
-            consequence.append(self.combat_system.start_combat(enemies))
+            consequence.append('A combat has started')
+            self.combat_mode = True
+            self.current_enemies = self.starts_combat(x, y)[1]
         return consequence
+
+# Player actions
+
+    def take_object(self, object_coordinates, item):
+        self.crew.take_item(item)
+        del self.items[object_coordinates]
+
+    def get_new_nakama(self, nakama_coordinates, nakama):
+        self.crew.add_nakama(nakama)
+        del self.new_nakamas[nakama_coordinates]
+
+    def starts_combat(self, x, y):
+        combat = False
+        enemies = []
+        for enemy in self.enemies.values():
+            if enemy.is_in_range(x, y):
+                combat += True
+                enemies.append(enemy)
+        return combat, enemies
+
+    def fight(self, fighter, enemy):
+        self.combat_system.individual_fight(fighter, enemy)
+        print(fighter.health, enemy.health)
+        if enemy.health <= 0:
+            self.current_enemies.remove(enemy)
+            del self.enemies[enemy.x, enemy.y]
