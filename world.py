@@ -1,7 +1,6 @@
 from random import randrange
-from item import Food, Npc
+from item import Food, Npc, Enemy
 from crew import Nakama, Crew
-from combat_system import Enemy, CombatSystem
 from terrain import Terrain
 
 
@@ -14,7 +13,6 @@ class World:
         self.new_nakamas = {}
         self.obstacles = set()
         self.crew = Crew()
-        self.combat_system = CombatSystem(self, self.crew)
         self.board = None
         self.random_map_generator()
         self.combat_mode = False
@@ -105,7 +103,7 @@ class World:
     def get_terrain(self, x, y):
         return self.board[y][x]
 
-# World changes
+    # World changes
 
     def update(self, command):
         events = []
@@ -140,7 +138,7 @@ class World:
             self.current_enemies = self.starts_combat(x, y)[1]
         return consequence
 
-# Player actions
+    # Player actions
 
     def take_object(self, object_coordinates, item):
         self.crew.take_item(item)
@@ -149,6 +147,8 @@ class World:
     def get_new_nakama(self, nakama_coordinates, nakama):
         self.crew.add_nakama(nakama)
         del self.new_nakamas[nakama_coordinates]
+
+    # Combat system
 
     def starts_combat(self, x, y):
         combat = False
@@ -160,8 +160,23 @@ class World:
         return combat, enemies
 
     def fight(self, fighter, enemy):
-        self.combat_system.individual_fight(fighter, enemy)
+        self.individual_fight(fighter, enemy)
         print(fighter.health, enemy.health)
         if enemy.health <= 0:
             self.current_enemies.remove(enemy)
             del self.enemies[enemy.x, enemy.y]
+
+    @classmethod
+    def individual_fight(cls, fighter, enemy):
+        fighter_stats = fighter.combat_characteristics
+        enemy_stats = enemy.combat_characteristics
+        enemy_hurt = enemy_stats['close_defense'] - fighter_stats['close_attack'] + \
+                     enemy_stats['range_defense'] - fighter_stats['range_attack'] + \
+                     enemy_stats['morale_defense'] - fighter_stats['morale_attack']
+
+        fighter_hurt = fighter_stats['close_defense'] - enemy_stats['close_attack'] + \
+                       fighter_stats['range_defense'] - enemy_stats['range_attack'] + \
+                       fighter_stats['morale_defense'] - enemy_stats['morale_attack']
+
+        enemy.health += enemy_hurt if enemy_hurt < 0 else 0
+        fighter.health += fighter_hurt if fighter_hurt < 0 else 0
