@@ -17,8 +17,9 @@ class FancyDisplay:
 
         self.sheet = pygame.image.load('graphics/terrain.png')
         self.terrain = self.strip_from_sheet(self.sheet, (0, 0), (32, 32), 32, 32)
-
         self.player = pygame.image.load('graphics/player_icons/luffy.png').convert_alpha()
+        self.npc = pygame.image.load('graphics/npc.png').convert_alpha()
+        self.enemy = pygame.image.load('graphics/enemy.png').convert_alpha()
 
     def display_world(self, events):
         x_p, y_p = self.world.crew.x, self.world.crew.y
@@ -35,34 +36,23 @@ class FancyDisplay:
                 elif cell == 'X':
                     self.screen.blit(self.terrain[109], self.convert(v_x, v_y))
                 else:
-                    self.screen.blit(self.terrain[97], self.convert(v_x, v_y))
+                    self.screen.blit(self.terrain[289], self.convert(v_x, v_y))
                 if (x, y) in self.world.obstacles:
-                    pass
+                    self.screen.blit(self.terrain[0], self.convert(v_x, v_y))
                 elif (x, y) in self.world.npc:
-                    pass
+                    self.screen.blit(self.npc, self.convert(v_x, v_y))
                 elif (x, y) == (x_p, y_p):
                     self.screen.blit(self.player, self.convert(v_x, v_y))
                 elif (x, y) in self.world.items:
-                    pass
+                    self.screen.blit(self.terrain[355], self.convert(v_x, v_y))
                 elif (x, y) in self.world.new_nakamas:
                     nakama = self.world.new_nakamas[x, y]
-                    pass
+                    self.screen.blit(self.npc, self.convert(v_x, v_y))
                 elif (x, y) in self.world.enemies:
-                    pass
+                    self.screen.blit(self.enemy, self.convert(v_x, v_y))
 
         pygame.display.update()
         self.clock.tick(10)
-
-    """def main_loop(self):
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    running = False
-            self.display_terrain()
-            pygame.display.flip()"""
 
     def convert(self, x, y):
         return self.resolution * x, self.resolution * y
@@ -70,6 +60,27 @@ class FancyDisplay:
     def get_terrain_graphic(self, x, y):
         terrain_type = self.board[y][x]
         pass
+
+    def orientation_modifier(self, x, y):
+        current_block = self.board[y][x]
+        orientation_dic = [[0, 1, 1, 0], [0, 1, 1, 1], [0, 0, 1, 1],
+                           [1, 1, 1, 0], [1, 1, 1, 1], [1, 0, 1, 1],
+                           [1, 1, 0, 0], [1, 1, 0, 1], [1, 0, 0, 1],
+                           [0, 0, 0, 0], [1, 0, 0, 0], [0, 1, 0, 0],
+                           [0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 1, 0],
+                           [0, 1, 0, 1]]
+
+        surrounding_blocks = {'upper_block': self.board[y + 1][x], 'right_block': self.board[y][x + 1],
+                              'down_block': self.board[y - 1][x], 'left_block': self.board[y][x - 1]}
+        block_orientation = []
+        for block in surrounding_blocks.values():
+            if block == current_block:
+                block_orientation.append(1)
+            else:
+                block_orientation.append(0)
+        orientation = orientation_dic.index(block_orientation)
+        modifier_list = [0, 1, 2, 32, 33, 34, 64, 65, 66, - 64, - 64, - 64, - 64, - 64, - 64, - 64]
+        return modifier_list[orientation]
 
     @classmethod
     def strip_from_sheet(cls, sheet, start, size, columns, rows):
@@ -79,8 +90,3 @@ class FancyDisplay:
                 location = (start[0] + size[0] * i, start[1] + size[1] * j)
                 frames.append(sheet.subsurface(pygame.Rect(location, size)))
         return frames
-
-
-
-
-
