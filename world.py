@@ -55,7 +55,7 @@ class World:
         for nakama in possible_nakamas:
             self.new_nakamas[self.empty_spot(only_on="PCGRV")] = nakama
 
-    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=30):  # TODO change nb of enemies
+    def random_map_generator(self, nb_obstacles=10, nb_items=3, nb_npc=2, nb_enemies=3):  # TODO change nb of enemies
         terrain: Terrain = Terrain()
         terrain.generate_island()
         self.board = terrain.get_board()
