@@ -15,11 +15,8 @@ class FancyDisplay:
         pygame.display.set_caption('OnePyce terrain generator')
         self.clock = pygame.time.Clock()
 
-        self.grass = pygame.image.load('graphics/terrain/grass.png').convert()
-        self.land = pygame.image.load('graphics/terrain/land.png').convert()
-        self.mountain = pygame.image.load('graphics/terrain/mountain.png').convert()
-        self.water = pygame.image.load('graphics/terrain/water.png').convert()
-        self.wood = pygame.image.load('graphics/terrain/wood.png').convert()
+        self.sheet = pygame.image.load('graphics/terrain.png')
+        self.terrain = self.strip_from_sheet(self.sheet, (0, 0), (32, 32), 32, 32)
 
         self.player = pygame.image.load('graphics/player_icons/luffy.png').convert_alpha()
 
@@ -34,11 +31,11 @@ class FancyDisplay:
                 else:
                     cell = 'S'
                 if cell == 'S':
-                    self.screen.blit(self.water, self.convert(v_x, v_y))
+                    self.screen.blit(self.terrain[124], self.convert(v_x, v_y))
                 elif cell == 'X':
-                    self.screen.blit(self.mountain, self.convert(v_x, v_y))
+                    self.screen.blit(self.terrain[109], self.convert(v_x, v_y))
                 else:
-                    self.screen.blit(self.grass, self.convert(v_x, v_y))
+                    self.screen.blit(self.terrain[97], self.convert(v_x, v_y))
                 if (x, y) in self.world.obstacles:
                     pass
                 elif (x, y) in self.world.npc:
@@ -56,7 +53,7 @@ class FancyDisplay:
         pygame.display.update()
         self.clock.tick(10)
 
-    def main_loop(self):
+    """def main_loop(self):
         running = True
         while running:
             for event in pygame.event.get():
@@ -65,7 +62,7 @@ class FancyDisplay:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     running = False
             self.display_terrain()
-            pygame.display.flip()
+            pygame.display.flip()"""
 
     def convert(self, x, y):
         return self.resolution * x, self.resolution * y
@@ -73,6 +70,15 @@ class FancyDisplay:
     def get_terrain_graphic(self, x, y):
         terrain_type = self.board[y][x]
         pass
+
+    @classmethod
+    def strip_from_sheet(cls, sheet, start, size, columns, rows):
+        frames = []
+        for j in range(rows):
+            for i in range(columns):
+                location = (start[0] + size[0] * i, start[1] + size[1] * j)
+                frames.append(sheet.subsurface(pygame.Rect(location, size)))
+        return frames
 
 
 
