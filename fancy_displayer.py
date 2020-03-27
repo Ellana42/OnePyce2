@@ -1,4 +1,5 @@
 import pygame
+import random
 
 
 class FancyDisplay:
@@ -15,11 +16,17 @@ class FancyDisplay:
         pygame.display.set_caption('OnePyce terrain generator')
         self.clock = pygame.time.Clock()
 
-        self.sheet = pygame.image.load('graphics/terrain.png')
+        self.sheet = pygame.image.load('graphics/terrain.png').convert_alpha()
+        self.sheet2 = pygame.image.load('graphics/terrain2.png').convert_alpha()
         self.terrain = self.strip_from_sheet(self.sheet, (0, 0), (32, 32), 32, 32)
+        self.terrain2 = self.strip_from_sheet(self.sheet2, (0, 0),  (32, 32), 32, 32)
         self.player = pygame.image.load('graphics/player_icons/luffy.png').convert_alpha()
         self.npc = pygame.image.load('graphics/npc.png').convert_alpha()
         self.enemy = pygame.image.load('graphics/enemy.png').convert_alpha()
+
+        self.terrain_dict = {'S': 124, 'E': 189, 'M': 549, 'F': 198, 'B': 771,
+                             'P': 357, 'C': 304, 'X': 12, 'G': 307,
+                             'R': 422, 'V': 589 }
 
     def display_world(self, events):
         x_p, y_p = self.world.crew.x, self.world.crew.y
@@ -31,16 +38,8 @@ class FancyDisplay:
                     cell = self.board[y][x]
                 else:
                     cell = 'S'
-                if cell == 'S':
-                    self.screen.blit(self.terrain[124], self.convert(v_x, v_y))
-                elif cell == 'X':
-                    modifiers = self.orientation_modifier(x, y)
-                    orientation = modifiers[0]
-                    sub_terrain = modifiers[1]
-                    self.screen.blit(self.terrain[289], self.convert(v_x, v_y))
-                    self.screen.blit(self.terrain[76 + orientation], self.convert(v_x, v_y))
-                else:
-                    self.screen.blit(self.terrain[289], self.convert(v_x, v_y))
+                if cell in self.terrain_dict:
+                    self.screen.blit(self.terrain[self.terrain_dict[cell]], self.convert(v_x, v_y))
                 if (x, y) in self.world.obstacles:
                     self.screen.blit(self.terrain[0], self.convert(v_x, v_y))
                 elif (x, y) in self.world.npc:
@@ -48,7 +47,7 @@ class FancyDisplay:
                 elif (x, y) == (x_p, y_p):
                     self.screen.blit(self.player, self.convert(v_x, v_y))
                 elif (x, y) in self.world.items:
-                    self.screen.blit(self.terrain[355], self.convert(v_x, v_y))
+                    self.screen.blit(self.terrain2[463], self.convert(v_x, v_y))
                 elif (x, y) in self.world.new_nakamas:
                     nakama = self.world.new_nakamas[x, y]
                     self.screen.blit(self.npc, self.convert(v_x, v_y))
@@ -87,8 +86,6 @@ class FancyDisplay:
         orientation = orientation_dic.index(block_orientation)
         modifier_list = [0, 1, 2, 32, 33, 34, 64, 65, 66, - 64, - 64, - 64, - 64, - 64, - 64, - 64]
         return modifier_list[orientation], subterrain_type
-
-
 
     @classmethod
     def strip_from_sheet(cls, sheet, start, size, columns, rows):
