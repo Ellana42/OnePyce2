@@ -34,7 +34,11 @@ class FancyDisplay:
                 if cell == 'S':
                     self.screen.blit(self.terrain[124], self.convert(v_x, v_y))
                 elif cell == 'X':
-                    self.screen.blit(self.terrain[109], self.convert(v_x, v_y))
+                    modifiers = self.orientation_modifier(x, y)
+                    orientation = modifiers[0]
+                    sub_terrain = modifiers[1]
+                    self.screen.blit(self.terrain[289], self.convert(v_x, v_y))
+                    self.screen.blit(self.terrain[76 + orientation], self.convert(v_x, v_y))
                 else:
                     self.screen.blit(self.terrain[289], self.convert(v_x, v_y))
                 if (x, y) in self.world.obstacles:
@@ -73,14 +77,18 @@ class FancyDisplay:
         surrounding_blocks = {'upper_block': self.board[y + 1][x], 'right_block': self.board[y][x + 1],
                               'down_block': self.board[y - 1][x], 'left_block': self.board[y][x - 1]}
         block_orientation = []
+        subterrain_type = None
         for block in surrounding_blocks.values():
             if block == current_block:
                 block_orientation.append(1)
             else:
                 block_orientation.append(0)
+                subterrain_type = block
         orientation = orientation_dic.index(block_orientation)
         modifier_list = [0, 1, 2, 32, 33, 34, 64, 65, 66, - 64, - 64, - 64, - 64, - 64, - 64, - 64]
-        return modifier_list[orientation]
+        return modifier_list[orientation], subterrain_type
+
+
 
     @classmethod
     def strip_from_sheet(cls, sheet, start, size, columns, rows):
