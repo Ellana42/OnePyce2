@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 
-terrain_file = pygame.image.load('graphics/terrain2.png')
+terrain_file = pygame.image.load('graphics/terrain.png')
 
 resolution = 32
 height, width = 32, 32

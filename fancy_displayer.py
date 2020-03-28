@@ -10,8 +10,8 @@ class FancyDisplay:
 
         pygame.init()
         self.resolution = 32
-        self.vision_width, self.vision_height = 31, 21
-        self.size_x, self.size_y = self.vision_width * self.resolution, self.vision_height * self.resolution
+        self.v_width, self.v_heigth = 31, 21
+        self.size_x, self.size_y = self.v_width * self.resolution, self.v_heigth * self.resolution
         self.screen = pygame.display.set_mode((self.size_x, self.size_y))
         pygame.display.set_caption('OnePyce terrain generator')
         self.clock = pygame.time.Clock()
@@ -19,46 +19,47 @@ class FancyDisplay:
         self.sheet = pygame.image.load('graphics/terrain.png').convert_alpha()
         self.sheet2 = pygame.image.load('graphics/terrain2.png').convert_alpha()
         self.terrain = self.strip_from_sheet(self.sheet, (0, 0), (32, 32), 32, 32)
-        self.terrain2 = self.strip_from_sheet(self.sheet2, (0, 0),  (32, 32), 32, 32)
-        self.player = pygame.image.load('graphics/player_icons/luffy.png').convert_alpha()
-        self.npc = pygame.image.load('graphics/npc.png').convert_alpha()
-        self.enemy = pygame.image.load('graphics/enemy.png').convert_alpha()
+        self.terrain2 = self.strip_from_sheet(self.sheet2, (0, 0), (32, 32), 32, 32)
 
-        self.terrain_dict = {'S': 124, 'E': 189, 'M': 549, 'F': 198, 'B': 771,
-                             'P': 357, 'C': 304, 'X': 12, 'G': 307,
-                             'R': 422, 'V': 589 }
+        self.terrain_dict = {'S': 124, 'E': 189, 'M': 106, 'F': 358, 'B': 360,
+                             'P': 353, 'C': 352, 'X': 106, 'G': 307,
+                             'R': 701, 'V': 489}
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+        self.text = self.font.render('Energy', True, (0, 0, 0)).convert_alpha()
 
     def display_world(self, events):
         x_p, y_p = self.world.crew.x, self.world.crew.y
-        for v_y in range(self.vision_height):
-            for v_x in range(self.vision_width):
-                x = v_x + x_p - self.vision_width // 2
-                y = v_y + y_p - self.vision_height // 2
+
+        for v_y in range(self.v_heigth):
+            for v_x in range(self.v_width):
+
+                x = v_x + x_p - self.v_width // 2
+                y = v_y + y_p - self.v_heigth // 2
+
                 if x in range(self.width) and y in range(self.height):
                     cell = self.board[y][x]
                 else:
                     cell = 'S'
-                if cell in self.terrain_dict:
-                    self.screen.blit(self.terrain[self.terrain_dict[cell]], self.convert(v_x, v_y))
-                if (x, y) in self.world.obstacles:
-                    self.screen.blit(self.terrain[0], self.convert(v_x, v_y))
-                elif (x, y) in self.world.npc:
-                    self.screen.blit(self.npc, self.convert(v_x, v_y))
+
+                self.display(self.terrain[self.terrain_dict[cell]], v_x, v_y)
+
+                things = self.world.get_tile_object(x, y)
+                if things is not None and things != 'obstacle':
+                    self.display(things.get_icon(), v_x, v_y)
+
                 elif (x, y) == (x_p, y_p):
-                    self.screen.blit(self.player, self.convert(v_x, v_y))
-                elif (x, y) in self.world.items:
-                    self.screen.blit(self.terrain2[463], self.convert(v_x, v_y))
-                elif (x, y) in self.world.new_nakamas:
-                    nakama = self.world.new_nakamas[x, y]
-                    self.screen.blit(self.npc, self.convert(v_x, v_y))
-                elif (x, y) in self.world.enemies:
-                    self.screen.blit(self.enemy, self.convert(v_x, v_y))
+                    self.display(self.world.crew.get_icon(), v_x, v_y)
+
+                self.display(self.text, self.v_width - 6, 1)
 
         pygame.display.update()
         self.clock.tick(10)
 
     def convert(self, x, y):
         return self.resolution * x, self.resolution * y
+
+    def display(self, image, x, y):
+        self.screen.blit(image, self.convert(x, y))
 
     def get_terrain_graphic(self, x, y):
         terrain_type = self.board[y][x]

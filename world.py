@@ -21,6 +21,19 @@ class World:
 
     # World generation --------------------------------
 
+    def random_map_generator(self, nb_obstacles=0, nb_items=10, nb_npc=5, nb_enemies=5):
+        terrain: Terrain = Terrain()
+        terrain.generate_island()
+        self.board = terrain.get_board()
+        self.width, self.height = terrain.get_dimensions()
+        self.add_obstacles(nb_obstacles)
+        self.add_items(nb_items)
+        self.add_npc(nb_npc)
+        self.add_enemies(nb_enemies)
+        self.add_future_nakamas(Nakama.get_possible_nakamas())
+        x, y = self.empty_spot(only_on="PCGRV")
+        self.crew.move_to(x, y)
+
     def empty_spot(self, only_on=None, avoids=None):
         while True:
             c, r = random_coordinates = randrange(self.width), randrange(self.height)
@@ -36,39 +49,27 @@ class World:
 
     def add_obstacles(self, nb_obstacles):
         for _ in range(nb_obstacles):
-            self.obstacles.add(self.empty_spot(avoids="SE"))
+            self.obstacles.add(self.empty_spot(avoids="SEMX"))
 
     def add_items(self, nb_items):
         for _ in range(nb_items):
-            self.items[self.empty_spot(avoids="SE")] = Food()  # All items are food for now
+            self.items[self.empty_spot(avoids="SEMX")] = Food()  # All items are food for now
 
     def add_npc(self, nb_npc):
         for _ in range(nb_npc):
-            self.npc[self.empty_spot(avoids="SE")] = Npc()
+            self.npc[self.empty_spot(only_on="PCGRV")] = Npc()
 
     def add_enemies(self, nb_enemies):
         for _ in range(nb_enemies):
-            x, y = self.empty_spot(avoids='SE')
+            x, y = self.empty_spot(avoids='SEMX')
             self.enemies[x, y] = Enemy(x, y)
 
     def add_future_nakamas(self, possible_nakamas):
         for nakama in possible_nakamas:
             self.new_nakamas[self.empty_spot(only_on="PCGRV")] = nakama
 
-    def random_map_generator(self, nb_obstacles=0, nb_items=10, nb_npc=2, nb_enemies=3):  # TODO change nb of enemies
-        terrain: Terrain = Terrain()
-        terrain.generate_island()
-        self.board = terrain.get_board()
-        self.width, self.height = terrain.get_dimensions()
-        self.add_obstacles(nb_obstacles)
-        self.add_items(nb_items)
-        self.add_npc(nb_npc)
-        self.add_enemies(nb_enemies)
-        self.add_future_nakamas(Nakama.get_possible_nakamas())
-        x, y = self.empty_spot(only_on="PCGRV")
-        self.crew.move_to(x, y)
-
     # Movement mechanics --------------------------------
+
     def wanna_go(self, direction):
         x, y = self.crew.get_position()
         if direction == 'up':
@@ -98,6 +99,25 @@ class World:
 
     def is_enemy(self, x, y):
         return (x, y) in self.enemies
+
+    def there_is_anything(self, x, y):
+        index = self.is_enemy(x, y) | self.is_nakama(x, y) \
+                | self.is_npc(x, y) | self.is_object(x, y) | self.is_obstacle(x, y)
+        return index
+
+    def get_tile_object(self, x, y):
+        if not self.there_is_anything(x, y):
+            return None
+        if self.is_obstacle(x, y):
+            return 'obstacle'
+        elif self.is_object(x, y):
+            return self.items[x, y]
+        elif self.is_npc(x, y):
+            return self.npc[x, y]
+        elif self.is_nakama(x, y):
+            return self.new_nakamas[x, y]
+        elif self.is_enemy(x, y):
+            return self.enemies[x, y]
 
     def get_terrain(self, x, y):
         return self.board[y][x]

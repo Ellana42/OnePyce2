@@ -1,12 +1,17 @@
 from random import randrange, randint
+import pygame
 
 
 class Item:
     def __init__(self):
         self.id_number = randint(0, 100)
+        self.icon = pygame.image.load('graphics/item.png')
 
     def get_item_id(self):
         return self.id_number
+
+    def get_icon(self):
+        return self.icon
 
 
 class Food(Item):
@@ -21,14 +26,19 @@ class Food(Item):
 class Npc:
     def __init__(self):
         self.id_number = randint(100, 200)
+        self.icon = pygame.image.load('graphics/npc.png')
 
     def talk(self):
         return str(self.id_number) + '=' * 10 + ' Good morning peasant ! ' + '=' * 10
+
+    def get_icon(self):
+        return self.icon
 
 
 class Enemy:
     def __init__(self, x, y):
         self.id_number = 10000
+        self.icon = pygame.image.load('graphics/enemy.png')
         self.health = 30
         self.attack_range = 1
         self.strength = 10
@@ -50,3 +60,6 @@ class Enemy:
 
     def is_in_range(self, x, y):  # TODO take of the edges
         return abs(self.x - x) <= self.attack_range and abs(self.y - y) <= self.attack_range
+
+    def get_icon(self):
+        return self.icon
