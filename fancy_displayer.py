@@ -114,7 +114,7 @@ class TextBox:
         line = len(self.text) - 1
         self.text.append(text)
         rendered_text = self.font.render(text, True, self.text_color).convert_alpha()
-        self.display(rendered_text, self.v_width - 7.5, self.v_height - 3.5)
+        # self.display(rendered_text, self.v_width - 7.5, self.v_height - 3.5)
 
 
 class InfoBox(TextBox):
@@ -130,7 +130,7 @@ class ChatBox(TextBox):
         self.width, self.height = 7, 3
         self.x, self.y = self.screen_width - 8, self.screen_height - 4
 
-
+'''
 self.display_up('Energy : ' + str(self.world.crew.get_energy()))
 self.display_up(str([nakama.get_name() for nakama in self.world.crew.crew]), 1)
 self.display_down('Hello peasant')
@@ -141,9 +141,10 @@ def display_up(self, text, line_number=0, color=(0, 0, 0)):
 
 
 def display_down(self, text, color=(0, 0, 0)):
+    pass
 
 
 
 def display_text(self, text, x, y, color=(0, 0, 0)):
     rendered_text = self.font.render(text, True, color).convert_alpha()
-    self.display(rendered_text, x, y)
+    self.display(rendered_text, x, y)'''
