@@ -8,12 +8,13 @@ class World:
 
     def __init__(self):
         self.width, self.height = None, None
+        self.spawn_point = (0, 0)
         self.items = {}
         self.npc = {}
         self.enemies = {}
         self.new_nakamas = {}
         self.obstacles = set()
-        self.crew = Crew()
+        self.crew = Crew(self)
         self.board = None
         self.random_map_generator()
         self.combat_mode = False
@@ -21,7 +22,7 @@ class World:
 
     # World generation --------------------------------
 
-    def random_map_generator(self, nb_obstacles=0, nb_items=10, nb_npc=5, nb_enemies=5):
+    def random_map_generator(self, nb_obstacles=0, nb_items=10, nb_npc=5, nb_enemies=8):
         terrain: Terrain = Terrain()
         terrain.generate_island()
         self.board = terrain.get_board()
@@ -31,8 +32,8 @@ class World:
         self.add_npc(nb_npc)
         self.add_enemies(nb_enemies)
         self.add_future_nakamas(Nakama.get_possible_nakamas())
-        x, y = self.empty_spot(only_on="PCGRV")
-        self.crew.move_to(x, y)
+        self.spawn_point = self.empty_spot(only_on="PCGRV")
+        self.crew.move_to(self.spawn_point[0], self.spawn_point[1])
 
     def empty_spot(self, only_on=None, avoids=None):
         while True:
@@ -122,6 +123,9 @@ class World:
     def get_terrain(self, x, y):
         return self.board[y][x]
 
+    def player_respawn(self):
+        self.crew.move_to(self.spawn_point[0], self.spawn_point[1])
+
     # World changes
 
     def update(self, command):
@@ -184,6 +188,13 @@ class World:
         if enemy.health <= 0:
             self.current_enemies.remove(enemy)
             del self.enemies[enemy.x, enemy.y]
+        '''if fighter.health <= 0:
+            if len(self.crew.crew) >= 2:
+                self.crew.wounded_nakamas.append(fighter)
+                self.crew.switch_nakama()
+                self.crew.crew.remove(fighter)
+            else:
+                self.player_respawn()'''
 
     @classmethod
     def individual_fight(cls, fighter, enemy):

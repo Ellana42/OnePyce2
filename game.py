@@ -1,7 +1,5 @@
 from world import World
-from displayer import Display
 from fancy_displayer import FancyDisplay
-from pygame import Color
 
 
 class Game:
@@ -42,7 +40,6 @@ class Game:
         for event in events:
             if event == 'A combat has started':
                 self.switch_state(self.combat)
-
 
 
 class Inputer:
@@ -103,16 +100,3 @@ class InputerPygame:
     def text_objects(cls, text, font):
         text_surface = font.render(text, True, pygame.black)
         return text_surface, text_surface.get_rect()
-
-    def message_display(self, text):
-        w, h = self.world.get_dimensions()
-        large_text = pygame.font.Font('freesansbold.ttf', 115)
-        text_surface, text_rect = self.text_objects(text, large_text)
-        text_rect.center = ((w / 2), (h / 2))
-        self.world.display.blit(text_surface, text_rect)
-
-        pygame.display.update()
-
-        pygame.time.sleep(2)
-
-

@@ -47,7 +47,7 @@ class Enemy:
         self.x = x
         self.y = y
         self.combat_characteristics = {
-            'close_attack': 5,
+            'close_attack': 30,
             'range_attack': 5,
             'morale_attack': 5,
             'close_defense': 5,
@@ -58,7 +58,7 @@ class Enemy:
     def get_life(self):
         return self.health
 
-    def is_in_range(self, x, y):  # TODO take of the edges
+    def is_in_range(self, x, y):
         return abs(self.x - x) <= self.attack_range and abs(self.y - y) <= self.attack_range
 
     def get_icon(self):

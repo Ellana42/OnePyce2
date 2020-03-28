@@ -4,13 +4,15 @@ import pygame
 
 
 class Crew:
-    def __init__(self):
+    def __init__(self, world):
+        self.world = world
         self.x = 0
         self.y = 0
         self.inventory = []
         self.crew = [Luffy()]
         self.current_nakama = 0
-        self.energy_level = 101
+        self.energy_level = 100
+        self.wounded_nakamas = []
 
     def switch_nakama(self):
         self.current_nakama = (self.current_nakama + 1) % len(self.crew)
@@ -23,6 +25,7 @@ class Crew:
             for item in self.inventory:
                 if type(item) is Food:
                     self.energy_level += item.get_energetic_value()
+                    self.inventory.remove(item)
                     return ['Yummy !']
                 else:
                     return ['There\'s a problem with item generation']
@@ -55,8 +58,7 @@ class Crew:
             return []
 
     def die_from_exhaustion(self):
-        self.x = 0
-        self.y = 0
+        self.respawn()
         self.energy_level = 100
 
     def add_nakama(self, nakama):
@@ -70,11 +72,14 @@ class Crew:
         crew_names = {nakama.name: nakama for nakama in self.crew}
         return crew_names[name]
 
-    def respawn(self, fighter):
-        pass
+    def respawn(self):
+        self.world.player_respawn()
 
     def get_icon(self):
         return self.crew[self.current_nakama].get_icon()
+
+    def get_energy(self):
+        return self.energy_level
 
 
 class Nakama:
@@ -84,6 +89,7 @@ class Nakama:
         self.standard_tiredness = 1
         self.terrains_characteristics = {}
         self.health = 50
+        self.name = ''
         self.combat_characteristics = {
             'close_attack': 10,
             'range_attack': 10,
@@ -109,7 +115,8 @@ class Nakama:
             return self.standard_tiredness
         return self.get_nakama_tiredness_for(self.terrains_characteristics[location])
 
-
+    def get_name(self):
+        return self.name
 
     @classmethod
     def get_possible_nakamas(cls):
@@ -130,7 +137,7 @@ class Luffy(Nakama):
         if location["type"] == "Mountain":
             return 3
         if location["type"] == "Water":
-            return 1  # TODO to change back
+            return 100
         return super().get_nakama_tiredness_for(location)
 
 
@@ -140,6 +147,7 @@ class Nami(Nakama):
         self.tiredness = {'X': 10, 'M': 10, 'S': 1, 'E': 1}
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
         self.name = 'Nami'
+        self.health = 25
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -172,6 +180,7 @@ class Usopp(Nakama):
         super().__init__()
         self.icon = pygame.image.load('graphics/player_icons/usopp.png')
         self.name = 'Usopp'
+        self.health = 20
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
