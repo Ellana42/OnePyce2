@@ -14,7 +14,7 @@ x, y = 0, 0
 clock = pygame.time.Clock()
 
 running = True
-
+vx, vy = 0, 0
 while running:
     previous_x, previous_y = x, y
     for event in pygame.event.get():
@@ -22,18 +22,20 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
-                y += 32
+                vx, vy = (0, 32)
             elif event.key == pygame.K_UP:
-                y -= 32
+                vx, vy = (0, -32)
             elif event.key == pygame.K_LEFT:
-                x -= 32
+                vx, vy = (-32, 0)
             elif event.key == pygame.K_RIGHT:
-                x += 32
+                vx, vy = (32, 0)
             if event.key == pygame.K_RETURN:
                 print(y + x // 32)
         if event.type == pygame.KEYUP:
+            vx, vy = 0, 0
             x, y = previous_x, previous_y
-
+    x += vx
+    y += vy
     screen.blit(terrain_file, (0, 0))
     screen.blit(selector, (x, y))
     pygame.display.update()
