@@ -1,5 +1,4 @@
 import pygame
-import random
 
 
 class FancyDisplay:
@@ -15,6 +14,7 @@ class FancyDisplay:
         self.screen = pygame.display.set_mode((self.size_x, self.size_y))
         pygame.display.set_caption('OnePyce terrain generator')
         self.clock = pygame.time.Clock()
+        self.font = pygame.font.Font('freesansbold.ttf', 15)
 
         self.sheet = pygame.image.load('graphics/terrain.png').convert_alpha()
         self.sheet2 = pygame.image.load('graphics/terrain2.png').convert_alpha()
@@ -43,8 +43,14 @@ class FancyDisplay:
                 elif (x, y) == (x_p, y_p):
                     self.display(self.world.crew.get_icon(), v_x, v_y)
 
-                InfoBox(self).show()
-                ChatBox(self).show()
+                info_box = InfoBox(self)
+                info_box.show()
+                info_box.write('Energy : ' + str(self.world.crew.get_energy()))
+                info_box.write(str([nakama.get_name() for nakama in self.world.crew.crew]))
+
+                chat_box = ChatBox(self)
+                chat_box.show()
+                chat_box.write('Hello peasant')
 
         pygame.display.update()
         self.clock.tick(10)
@@ -60,9 +66,6 @@ class FancyDisplay:
     def convert(self, x, y):
         return self.resolution * x, self.resolution * y
 
-    def convert1(self, x):
-        return self.resolution * x
-
     def display(self, image, x, y):
         self.screen.blit(image, self.convert(x, y))
 
@@ -74,6 +77,44 @@ class FancyDisplay:
                 location = (start[0] + size[0] * i, start[1] + size[1] * j)
                 frames.append(sheet.subsurface(pygame.Rect(location, size)))
         return frames
+
+
+class TextBox:
+    def __init__(self, disp):
+        self.width, self.height = 5, 5
+        self.color = (173, 161, 117)
+        self.disp = disp
+        self.screen = self.disp.screen
+        self.res = self.disp.resolution
+        self.screen_width, self.screen_height = self.disp.v_width, self.disp.v_height
+        self.x, self.y = self.screen_width // 2, self.screen_height // 2
+        self.text = []
+        self.text_color = (0, 0, 0)
+        self.font = self.disp.font
+
+    def show(self):
+        pygame.draw.rect(self.screen, self.color, (
+            self.res * self.x, self.res * self.y, self.res * self.width, self.res * self.height))
+
+    def write(self, text, next_line=True):
+        line = len(self.text) - 1
+        self.text.append(text)
+        rendered_text = self.font.render(text, True, self.text_color).convert_alpha()
+        self.disp.display(rendered_text, self.x + 0.5, self.y + 1.5 + line)
+
+
+class InfoBox(TextBox):
+    def __init__(self, disp):
+        super().__init__(disp)
+        self.width, self.height = 4, 5
+        self.x, self.y = self.screen_width - 5, 1
+
+
+class ChatBox(TextBox):
+    def __init__(self, disp):
+        super().__init__(disp)
+        self.width, self.height = 7, 3
+        self.x, self.y = self.screen_width - 8, self.screen_height - 4
 
     '''def orientation(self, x, y):
         set_block = self.board[y][x]
@@ -91,60 +132,3 @@ class FancyDisplay:
             return 0
         else:
             return modifiers[block_type]'''
-
-
-class TextBox:
-    def __init__(self, display):
-        self.width, self.height = 5, 5
-        self.color = (173, 161, 117)
-        self.display = display
-        self.screen = self.display.screen
-        self.res = self.display.resolution
-        self.screen_width, self.screen_height = self.display.v_width, self.display.v_height
-        self.x, self.y = self.screen_width // 2, self.screen_height // 2
-        self.text = []
-        self.text_color = (0, 0, 0)
-        self.font = pygame.font.Font('freesansbold.ttf', 15)
-
-    def show(self):
-        pygame.draw.rect(self.screen, self.color, (
-            self.res * self.x, self.res * self.y, self.res * self.width, self.res * self.height))
-
-    def write(self, text, next_line=True):
-        line = len(self.text) - 1
-        self.text.append(text)
-        rendered_text = self.font.render(text, True, self.text_color).convert_alpha()
-        # self.display(rendered_text, self.v_width - 7.5, self.v_height - 3.5)
-
-
-class InfoBox(TextBox):
-    def __init__(self, display):
-        super().__init__(display)
-        self.width, self.height = 4, 5
-        self.x, self.y = self.screen_width - 5, 1
-
-
-class ChatBox(TextBox):
-    def __init__(self, display):
-        super().__init__(display)
-        self.width, self.height = 7, 3
-        self.x, self.y = self.screen_width - 8, self.screen_height - 4
-
-'''
-self.display_up('Energy : ' + str(self.world.crew.get_energy()))
-self.display_up(str([nakama.get_name() for nakama in self.world.crew.crew]), 1)
-self.display_down('Hello peasant')
-
-
-def display_up(self, text, line_number=0, color=(0, 0, 0)):
-    self.display_text(text, self.v_width - 4.5, 1.5 + line_number, color)
-
-
-def display_down(self, text, color=(0, 0, 0)):
-    pass
-
-
-
-def display_text(self, text, x, y, color=(0, 0, 0)):
-    rendered_text = self.font.render(text, True, color).convert_alpha()
-    self.display(rendered_text, x, y)'''
