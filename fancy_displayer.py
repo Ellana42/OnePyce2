@@ -25,6 +25,9 @@ class FancyDisplay:
                              'P': 353, 'C': 352, 'X': 106, 'G': 307,
                              'R': 701, 'V': 489}
 
+        self.info_box = InfoBox(self)
+        self.chat_box = ChatBox(self)
+
     def display_world(self, events):
         x_p, y_p = self.world.crew.x, self.world.crew.y
 
@@ -43,14 +46,16 @@ class FancyDisplay:
                 elif (x, y) == (x_p, y_p):
                     self.display(self.world.crew.get_icon(), v_x, v_y)
 
-                info_box = InfoBox(self)
-                info_box.show()
-                info_box.write('Energy : ' + str(self.world.crew.get_energy()))
-                info_box.write(str([nakama.get_name() for nakama in self.world.crew.crew]))
+                for event in events:
+                    self.chat_box.update(event, 0)
+                    if event == 'Hurray ! We\'ve got a new Nakama !':
+                        self.info_box.update(str([nakama.get_name() for nakama in self.world.crew.crew]), 1)
+                    if self.world.crew.get_energy() % 10 == 0:
+                        self.info_box.update('Energy : ' + str(self.world.crew.get_energy()), 0)
 
-                chat_box = ChatBox(self)
-                chat_box.show()
-                chat_box.write('Hello peasant')
+                self.info_box.show()
+
+                self.chat_box.show()
 
         pygame.display.update()
         self.clock.tick(10)
@@ -91,16 +96,18 @@ class TextBox:
         self.text = []
         self.text_color = (0, 0, 0)
         self.font = self.disp.font
+        self.rendered_text = None
 
     def show(self):
         pygame.draw.rect(self.screen, self.color, (
             self.res * self.x, self.res * self.y, self.res * self.width, self.res * self.height))
+        i = 0
+        for line in self.rendered_text:
+            self.disp.display(line, self.x + 0.5, self.y + 1.5 + i)
+            i += 1
 
-    def write(self, text, next_line=True):
-        line = len(self.text) - 1
-        self.text.append(text)
-        rendered_text = self.font.render(text, True, self.text_color).convert_alpha()
-        self.disp.display(rendered_text, self.x + 0.5, self.y + 1.5 + line)
+    def update(self, text, line):
+        self.rendered_text[line] = self.font.render(text, True, self.text_color).convert_alpha()
 
 
 class InfoBox(TextBox):
@@ -108,6 +115,8 @@ class InfoBox(TextBox):
         super().__init__(disp)
         self.width, self.height = 4, 5
         self.x, self.y = self.screen_width - 5, 1
+        self.rendered_text = [self.font.render('Energy', True, self.text_color).convert_alpha(),
+                              self.font.render('Luffy', True, self.text_color).convert_alpha()]
 
 
 class ChatBox(TextBox):
@@ -115,6 +124,7 @@ class ChatBox(TextBox):
         super().__init__(disp)
         self.width, self.height = 7, 3
         self.x, self.y = self.screen_width - 8, self.screen_height - 4
+        self.rendered_text = [self.font.render('Nothing here', True, self.text_color).convert_alpha()]
 
     '''def orientation(self, x, y):
         set_block = self.board[y][x]

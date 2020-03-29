@@ -148,6 +148,8 @@ class Nami(Nakama):
         self.tiredness = {'ground': 3, 'mountain': 10, 'water': 1}
         self.name = 'Nami'
         self.health = 25
+        self.icon = pygame.image.load('graphics/player_icons/nami.png')
+
 
     def get_nakama_tiredness_for(self, location):
         if location["type"] == "Ground":
@@ -195,6 +197,7 @@ class Usopp(Nakama):
 class Sanji(Nakama):
     def __init__(self):
         super().__init__()
+        self.icon = pygame.image.load('graphics/player_icons/sanji.png')
         self.name = 'Sanji'
 
     def get_nakama_tiredness_for(self, location):
