@@ -50,7 +50,10 @@ class FancyDisplay:
                 for event in events:
                     self.chat_box.update(event, 0)
                     if event == 'Hurray ! We\'ve got a new Nakama !':
-                        self.info_box.update(str([nakama.get_name() for nakama in self.world.crew.crew]), 1)
+                        i = 1
+                        for nakama in self.world.crew.crew:
+                            self.info_box.update(nakama.get_name() +'    ' + str(nakama.get_health()), i)
+                            i += 1
 
                 if self.world.crew.get_energy() % 10 == 0:
                     self.info_box.update('Energy : ' + str(self.world.crew.get_energy()), 0)
@@ -97,13 +100,14 @@ class TextBox:
         self.text_color = (0, 0, 0)
         self.font = self.disp.font
         self.rendered_text = None
+        self.empty_surface = self.font.render('', True, self.text_color).convert_alpha()
 
     def show(self):
         pygame.draw.rect(self.screen, self.color, (
             self.res * self.x, self.res * self.y, self.res * self.width, self.res * self.height))
         i = 0
         for line in self.rendered_text:
-            self.disp.display(line, self.x + 0.5, self.y + 1.5 + i)
+            self.disp.display(line, self.x + 0.5, self.y + 0.5 + i)
             i += 1
 
     def update(self, text, line):
@@ -114,15 +118,19 @@ class InfoBox(TextBox):
     def __init__(self, disp):
         super().__init__(disp)
         self.width, self.height = 4, 5
-        self.x, self.y = self.screen_width - 5, 1
+        self.x, self.y = self.screen_width - (self.width + 1), 1
         self.rendered_text = [self.font.render('Energy', True, self.text_color).convert_alpha(),
-                              self.font.render('Luffy', True, self.text_color).convert_alpha()]
+                              self.font.render('Luffy', True, self.text_color).convert_alpha(),
+                              self.empty_surface,
+                              self.empty_surface,
+                              self.empty_surface,
+                              self.empty_surface,
+                              ]
 
 
 class ChatBox(TextBox):
     def __init__(self, disp):
         super().__init__(disp)
-        self.width, self.height = 7, 3
-        self.x, self.y = self.screen_width - 8, self.screen_height - 4
+        self.width, self.height = 10, 3
+        self.x, self.y = self.screen_width - (self.width + 1), self.screen_height - (self.height + 1)
         self.rendered_text = [self.font.render('Nothing here', True, self.text_color).convert_alpha()]
-

@@ -53,7 +53,7 @@ class Crew:
         self.energy_level -= self.crew[self.current_nakama].get_tiredness(location)
         if self.energy_level <= 0:
             self.die_from_exhaustion()
-            return ['That was too much ! I\'m going to rest for a bit ...']
+            return ['That was too much !', 'I\'m going to rest for a bit ...']
         else:
             return []
 
@@ -125,6 +125,9 @@ class Nakama:
     @classmethod
     def get_nakama_skin(cls):
         return {type(nakama): nakama.icon for nakama in Nakama.get_possible_nakamas()}
+
+    def get_health(self):
+        return self.health
 
 
 class Luffy(Nakama):

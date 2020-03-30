@@ -29,7 +29,7 @@ class Npc:
         self.icon = pygame.image.load('graphics/npc.png')
 
     def talk(self):
-        return str(self.id_number) + '=' * 10 + ' Good morning peasant ! ' + '=' * 10
+        return 'Good morning peasant ! '
 
     def get_icon(self):
         return self.icon
