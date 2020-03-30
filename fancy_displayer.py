@@ -27,6 +27,7 @@ class FancyDisplay:
 
         self.info_box = InfoBox(self)
         self.chat_box = ChatBox(self)
+        self.i = 0
 
     def display_world(self, events):
         x_p, y_p = self.world.crew.x, self.world.crew.y
@@ -50,11 +51,10 @@ class FancyDisplay:
                     self.chat_box.update(event, 0)
                     if event == 'Hurray ! We\'ve got a new Nakama !':
                         self.info_box.update(str([nakama.get_name() for nakama in self.world.crew.crew]), 1)
-                    if self.world.crew.get_energy() % 10 == 0:
-                        self.info_box.update('Energy : ' + str(self.world.crew.get_energy()), 0)
 
+                if self.world.crew.get_energy() % 10 == 0:
+                    self.info_box.update('Energy : ' + str(self.world.crew.get_energy()), 0)
                 self.info_box.show()
-
                 self.chat_box.show()
 
         pygame.display.update()
@@ -126,19 +126,3 @@ class ChatBox(TextBox):
         self.x, self.y = self.screen_width - 8, self.screen_height - 4
         self.rendered_text = [self.font.render('Nothing here', True, self.text_color).convert_alpha()]
 
-    '''def orientation(self, x, y):
-        set_block = self.board[y][x]
-        surroundings = [self.board[y + 1][x], self.board[y][x + 1], self.board[y - 1][x], self.board[y][x - 1]]
-        block_type = int("".join(str(x) for x in [int(block == set_block) for block in surroundings]), 2)
-        subterrain = 'P'
-        if block_type != 0:
-            subterrain = 'P'
-        return self.modifier(block_type, set_block), subterrain
-
-    @classmethod
-    def modifier(cls, block_type, set_block):
-        modifiers = [-97, 0, 0, 33, 0, 0, 31, 32, 0, -31, 0, 1, -33, -32, -1, 0]
-        if set_block in 'SVR':
-            return 0
-        else:
-            return modifiers[block_type]'''
